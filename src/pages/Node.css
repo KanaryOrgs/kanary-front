@@ -2,8 +2,9 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 50%;
-    height: 100%;
+    max-width: 750px; /* 부모 요소의 너비의 60%로 지정 */
+    min-width: 430px; /* 최소 너비 */
+    height: 100%; /* 부모 요소의 높이의 100%로 지정 */
     color: white;
     background-color: #1F2838;
     padding: 20px;
@@ -11,6 +12,12 @@
     z-index: 9999;
   }
 
-  body {
-    font-family: "Open Sans";
+@media (max-width: 900px) {
+  .popup {
+      max-width: 520px; /* 화면이 900px 이하일 때 최대 너비를 520px로 설정 */
   }
+}
+
+body {
+  font-family: "Open Sans";
+}
