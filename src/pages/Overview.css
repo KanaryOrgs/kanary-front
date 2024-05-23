@@ -1,16 +1,4 @@
-/* Overview.css */
-.dashboard {
-	display: flex;
-  }
-  
-  .main-content {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-  }
-  
-  .event-content {
+.event-content {
 	padding: 20px;
   }
   
@@ -30,46 +18,53 @@
 	margin-bottom: 20px;
   }
   
-  .status-card, .chart-card, .info-card, .event-card {
+  .status-card, .chart-card, .event-card {
 	background-color: #fff;
 	padding: 20px;
 	border-radius: 8px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	flex: 1;
-	margin-right: 10px;
+	margin-right: 20px;
   }
   
-  .status-card:last-child, .chart-card:last-child, .info-card:last-child {
+  .status-card:last-child, .chart-card:last-child, .event-card:last-child {
 	margin-right: 0;
   }
   
-  .chart-section {
+  .chart-info-container {
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 20px;
   }
   
-  .info-section {
+  
+  .info-cards {
 	display: flex;
-	justify-content: space-between;
 	flex-wrap: wrap;
-	margin-bottom: 20px;
+	justify-content: space-between;
+	flex: 1.075;
   }
   
   .info-card {
+	flex-basis: calc(50% - 10px);
+	margin-bottom: 5px;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	
+  }
+  
+  .chart-event-container {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  .event-card {
 	flex: 1;
-	margin-bottom: 20px;
-  }
-  
-  .info-card:nth-child(odd) {
-	margin-right: 10px;
-  }
-  
-  .event-section {
-	margin-bottom: 20px;
+	margin-right: 0;
   }
   
   .event-warning {
 	color: #d9534f;
   }
-  
