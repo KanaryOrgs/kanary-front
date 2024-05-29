@@ -271,25 +271,15 @@ export const Resources = () => {
   };
 
   return (
-    <div className="d-flex">
-      <div>
-        <Sidebar />
-      </div>
-      <div
-        style={{
-          flex: "1 1 auto",
-          display: "flex",
-          flexFlow: "column",
-          height: "100vh",
-          overflowY: "hidden",
-        }}
-      >
-        <Navbar />
+    <div className="d-flex E">
+        <div><Sidebar/></div>
+        <div style={{flex: "1 1 auto", display: "flex", flexFlow: "column", height: "100vh", overflowY: "hidden"}}>
+          <Navbar/>
         <div className="event-content">
           <div className="event-header">
             <div>
               <h2>Resources</h2>
-              <p></p>
+              <p>Kubernetes Cluster Resources</p>
             </div>
           </div>
         </div>

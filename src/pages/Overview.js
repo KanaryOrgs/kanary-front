@@ -50,7 +50,7 @@ const chartOptions = {
 
 export const Overview = () => {
   return (
-    <div className="d-flex dashboard">
+    <div className="d-flex E">
       <div><Sidebar /></div>
       <div style={{ flex: "1 1 auto", display: "flex", flexFlow: "column", height: "100vh", overflowY: "hidden" }}>
         <Navbar />
@@ -58,7 +58,7 @@ export const Overview = () => {
           <div className="event-header">
             <div>
               <h2>Overview</h2>
-              <p>Kubernetes Cluster Topology</p>
+              <p>Kubernetes Cluster Overview</p>
             </div>
           </div>
         </div>

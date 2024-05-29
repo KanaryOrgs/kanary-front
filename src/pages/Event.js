@@ -42,12 +42,12 @@ export const Event = () => {
       <div><Sidebar/></div>
       <div style={{flex:"1 1 auto", display:"flex", flexFlow:"column", height:"100vh", overflowY:"hidden"}}>
         <Navbar/>
-		<div className="event-content">
-          <div className="event-header">
-            <div>
-              <h2>Events</h2>
-              <p>Kubernetes Cluster Events</p>
-            </div>
+      <div className="event-content">
+            <div className="event-header">
+              <div>
+                <h2>Events</h2>
+                <p>Kubernetes Cluster Events</p>
+              </div>
             <input
               className="event-search-input"
               type="text"

@@ -1,4 +1,15 @@
-#tooltip {
+.event-content {
+    overflow-y: auto;
+    padding: 20px;
+  }
+  
+  .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  #tooltip {
     position: absolute;
     background-color: #fff;
     border: 1px solid #ccc;
