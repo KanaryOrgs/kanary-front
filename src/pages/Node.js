@@ -263,6 +263,7 @@ export const Node = () => {
                     />
                   </div>
                 </div>
+                
                 <CDBTable responsive>
                   <CDBTableHeader>
                     <tr style={{ verticalAlign: "middle" }}>
@@ -373,6 +374,7 @@ export const Node = () => {
                 </div>
               </div>
             </div>
+            
             {isPopupOpen && (
               <div className="popup">
                 <h2>
@@ -424,13 +426,12 @@ export const Node = () => {
                 </div>
               </div>
             )}
-            <footer className="footer">
-              <div className="d-flex align-items-center"></div>
-            </footer>
+            
           </div>
         </div>
       </div>
     </div>
+    
   );
 };
 

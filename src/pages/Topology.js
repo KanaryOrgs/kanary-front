@@ -58,12 +58,12 @@ export const Topology = () => {
         "labels": {
           "run": "nginx"
         },
-        "cpu_capacity": 7,
+        "cpu_capacity": 9,
         "ram_capacity": 15,
         "restarts": 0
       },
       {
-        "name": "nginx",
+        "name": "nginx-default",
         "namespace": "default",
         "images": [
           "nginx"
@@ -73,15 +73,15 @@ export const Topology = () => {
         "labels": {
           "run": "nginx"
         },
-        "cpu_capacity": 8,
-        "ram_capacity": 15,
+        "cpu_capacity": 4,
+        "ram_capacity": 7,
         "restarts": 0
       },
       {
-        "name": "pod",
+        "name": "httpbin",
         "namespace": "default",
         "images": [
-          "gninx"
+          "kennethreitz/httpbin"
         ],
         "ip": "10.244.171.68",
         "status": "Pending",
@@ -350,10 +350,12 @@ export const Topology = () => {
           <Navbar/>
           <div className="event-content">
             <div className="event-header">
+
               <div>
                 <h2>Topology</h2>
                 <p>Kubernetes Cluster Topology</p>
               </div>
+
               <div id="tooltip"></div>
               <div className='settings'>
                 <CDBContainer>
@@ -362,6 +364,7 @@ export const Topology = () => {
                     <CDBBtn className={selectedMetric === 'ram_capacity' ? 'active' : ''} onClick={() => setSelectedMetric('ram_capacity')} style={{ marginRight: '10px' }}>Memory</CDBBtn>
                   </CDBBtnGrp>
                 </CDBContainer>
+
                 <div className='dropdown'>
                   <Dropdown
                     label={`Namespace: ${selectedNamespace || 'Select'}`}
@@ -371,6 +374,7 @@ export const Topology = () => {
                 </div>
               </div>
             </div>
+            
             <ForceGraph2D
               ref={fgRef}
               graphData={{ nodes: filteredNodes, links: [] }}

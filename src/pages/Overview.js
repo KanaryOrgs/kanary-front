@@ -10,7 +10,7 @@ import "./Overview.css";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 // Sample data for the charts
 const cpuData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  labels: ['00:00', '03:30', '07:00', '10:30', '14:00', '17:30', '21:00'],
   datasets: [
     {
       label: '% CPU Usage',
@@ -23,7 +23,7 @@ const cpuData = {
 };
 
 const ramData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  labels: ['00:00', '03:30', '07:00', '10:30', '14:00', '17:30', '21:00'],
   datasets: [
     {
       label: '% RAM Usage',
@@ -68,13 +68,13 @@ export const Overview = () => {
               <h4>Nodes</h4>
               <p>No Connection: 0</p>
               <p>Not Ready: 0</p>
-              <p>Ready: 12</p>
+              <p>Ready: 2</p>
             </div>
             <div className="status-card">
               <h4>Pods</h4>
-              <p>Error: 0</p>
+              <p>Error: 1</p>
               <p>Pending: 0</p>
-              <p>Running: 12</p>
+              <p>Running: 15</p>
             </div>
           </div>
           <div className="chart-info-container">
@@ -87,11 +87,11 @@ export const Overview = () => {
             <div className="info-cards">
               <div className="info-card">
                 <h4>Top CPU Intensive Nodes</h4>
-                <p>Node 1</p>
+                <p>Master Node</p>
               </div>
               <div className="info-card">
                 <h4>Top RAM Intensive Nodes</h4>
-                <p>Node 2</p>
+                <p>Master Node</p>
               </div>
               <div className="info-card">
                 <h4>Top CPU Intensive Pods</h4>
@@ -113,7 +113,15 @@ export const Overview = () => {
             <div className="event-card">
               <h4>Events</h4>
               <p className="event-warning">
+                <p>
                 [Warning] Pod "Nginx-pod" restarted at xx:xx : Out of Memory
+                </p>
+                <p>
+                [Warning] Pod "kube-system" is running low on memory
+                </p>
+                <p>
+                [Error] Pod "nginx" was disconnected at xx:xx : some reason
+                </p>
               </p>
             </div>
           </div>
