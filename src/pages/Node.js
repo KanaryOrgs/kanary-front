@@ -10,170 +10,90 @@ export const Node = () => {
   // 샘플 데이터
   const sampleData = [
     {
-      name: "Apdule-arm-test-cluster",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
+      "name": "master",
+      "status": "Ready",
+      "ip": "10.10.0.118",
+      "cpu_core": 8,
+      "ram_capacity": 15,
+      "os": "Ubuntu 22.04.3 LTS",
+      "kubelet_version": "v1.29.4",
+      "conditions": [
+        "NetworkUnavailable=False",
+        "MemoryPressure=False",
+        "DiskPressure=False",
+        "PIDPressure=False",
+        "Ready=True"
+      ],
+      "labels": {
+        "beta.kubernetes.io/arch": "amd64",
+        "beta.kubernetes.io/os": "linux",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "master",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/control-plane": "",
+        "node.kubernetes.io/exclude-from-external-load-balancers": ""
+      },
+      "allocatable": {
+        "cpu": "8",
+        "ephemeral-storage": "35975901944",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "16269788Ki",
+        "pods": "110"
+      },
+      "capacity": {
+        "cpu": "8",
+        "ephemeral-storage": "39036352Ki",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "16372188Ki",
+        "pods": "110"
+      }
     },
     {
-      name: "hoxy",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "top",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "noire",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "kaka",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "halland",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "vako",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "martin",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "ludwidson",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "Bojanic",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "Kelvin",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "Matheus",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "kanary",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "soc",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "mbhong",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "leo",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "uhd",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "son",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2023.11.20",
+      "name": "worker",
+      "status": "Ready",
+      "ip": "10.10.0.119",
+      "cpu_core": 8,
+      "ram_capacity": 10,
+      "os": "Ubuntu 22.04.3 LTS",
+      "kubelet_version": "v1.29.4",
+      "conditions": [
+        "NetworkUnavailable=False",
+        "MemoryPressure=False",
+        "DiskPressure=False",
+        "PIDPressure=False",
+        "Ready=True"
+      ],
+      "labels": {
+        "beta.kubernetes.io/arch": "amd64",
+        "beta.kubernetes.io/os": "linux",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "worker",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/control-plane": "",
+        "node.kubernetes.io/exclude-from-external-load-balancers": ""
+      },
+      "allocatable": {
+        "cpu": "8",
+        "ephemeral-storage": "35975901944",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "16269788Ki",
+        "pods": "110"
+      },
+      "capacity": {
+        "cpu": "8",
+        "ephemeral-storage": "39036352Ki",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "16372188Ki",
+        "pods": "110"
+      }
     },
   ];
 
-  const pageSize = 12; // 최대 행 개수
+  const pageSize = 8; // 최대 행 개수
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
@@ -283,6 +203,15 @@ export const Node = () => {
                           fontSize: "12px",
                         }}
                       >
+                        IP
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor: "#7C7C7C",
+                          color: "#292929",
+                          fontSize: "12px",
+                        }}
+                      >
                         CPU
                       </th>
                       <th
@@ -301,15 +230,6 @@ export const Node = () => {
                           fontSize: "12px",
                         }}
                       >
-                        DISK
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor: "#7C7C7C",
-                          color: "#292929",
-                          fontSize: "12px",
-                        }}
-                      >
                         STATUS
                       </th>
                       <th
@@ -319,7 +239,7 @@ export const Node = () => {
                           fontSize: "12px",
                         }}
                       >
-                        POD
+                        OS
                       </th>
                       <th
                         style={{
@@ -328,7 +248,7 @@ export const Node = () => {
                           fontSize: "12px",
                         }}
                       >
-                        DATE CREATED
+                        KUBELET VERSION
                       </th>
                     </tr>
                   </CDBTableHeader>
@@ -336,12 +256,12 @@ export const Node = () => {
                     {currentPageData.map((row, index) => (
                       <tr key={index} onClick={() => openPopup(row)}>
                         <td>{row.name}</td>
-                        <td>{row.cpu}</td>
-                        <td>{row.mem}</td>
-                        <td>{row.disk}</td>
+                        <td>{row.ip}</td>
+                        <td>{row.cpu_core}</td>
+                        <td>{row.ram_capacity}</td>
                         <td>{row.status}</td>
-                        <td>{row.pod}</td>
-                        <td>{row.dateCreated}</td>
+                        <td>{row.os}</td>
+                        <td>{row.kubelet_version}</td>
                       </tr>
                     ))}
                   </CDBTableBody>

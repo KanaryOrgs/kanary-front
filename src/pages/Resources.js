@@ -10,179 +10,293 @@ export const Resources = () => {
   // 샘플 데이터
   const sampleData = [
     {
-      name: "Apdule-arm-test-cluster",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
+      "name": "nginx",
+      "namespace": "default",
+      "ip": "10.151.221.32",
+      "images": [
+        "nginx"
+      ],
+      "status": "Running",
+      "cpu_usage": 3,
+      "ram_usage": 7,
+      "labels": {
+        "run": "nginx"
+      },
+      "restarts": 0,
+      "node_name": "worker",
+      "start_time": "2024-05-22T11:04:56Z",
+      "volumes": [
+        "kube-api-access-jmlkn"
+      ]
     },
     {
-      name: "hoxy",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
+      "name": "nginx2",
+      "namespace": "nginx",
+      "images": [
+        "nginx"
+      ],
+      "ip": "10.24.11.231",
+      "status": "Running",
+      "labels": {
+        "run": "nginx"
+      },
+      "cpu_usage": 3,
+      "ram_usage": 12,
+      "restarts": 0,
+      "start_time": "2024-05-22T11:06:56Z",
+    },
+  
+    {
+      "name": "nginx3",
+      "namespace": "nginx",
+      "images": [
+        "nginx"
+      ],
+      "ip": "10.24.11.181",
+      "status": "Running",
+      "labels": {
+        "run": "nginx"
+      },
+      "cpu_usage": 9,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-22T11:08:56Z",
     },
     {
-      name: "top",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
+      "name": "nginx-default",
+      "namespace": "default",
+      "images": [
+        "nginx"
+      ],
+      "ip": "10.212.464.69",
+      "status": "Running",
+      "labels": {
+        "run": "nginx"
+      },
+      "cpu_usage": 4,
+      "ram_usage": 7,
+      "restarts": 0,
+      "start_time": "2024-05-21T06:04:51Z",
     },
     {
-      name: "noire",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
+      "name": "httpbin",
+      "namespace": "default",
+      "images": [
+        "kennethreitz/httpbin"
+      ],
+      "ip": "10.112.473.22",
+      "status": "Pending",
+      "labels": {
+        "run": "pod"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-28T04:02:56Z",
     },
     {
-      name: "kaka",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
+      "name": "calico-kube-controllers-7c968b5878-frgdz",
+      "namespace": "kube-system",
+      "images": [
+        "docker.io/calico/kube-controllers:v3.26.4"
+      ],
+      "ip": "10.244.171.66",
+      "status": "Running",
+      "labels": {
+        "k8s-app": "calico-kube-controllers",
+        "pod-template-hash": "7c968b5878"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "halland",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
+      "name": "calico-node-cccq9",
+      "namespace": "kube-system",
+      "images": [
+        "docker.io/calico/node:v3.26.4"
+      ],
+      "ip": "10.244.171.61",
+      "status": "Running",
+      "labels": {
+        "controller-revision-hash": "7489b54556",
+        "k8s-app": "calico-node",
+        "pod-template-generation": "1"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 12,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "vako",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
+      "name": "calico-node-xnwt5",
+      "namespace": "kube-system",
+      "images": [
+        "docker.io/calico/node:v3.26.4"
+      ],
+      "ip": "10.244.171.53",
+      "status": "Running",
+      "labels": {
+        "controller-revision-hash": "7489b54556",
+        "k8s-app": "calico-node",
+        "pod-template-generation": "1"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 7,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "martin",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
+      "name": "coredns-76f75df574-tpdg5",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/coredns/coredns:v1.11.1"
+      ],
+      "ip": "10.244.171.67",
+      "status": "Running",
+      "labels": {
+        "k8s-app": "kube-dns",
+        "pod-template-hash": "76f75df574"
+      },
+      "cpu_usage": 2,
+      "ram_usage": 20,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "ludwidson",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
+      "name": "coredns-76f75df574-x72z8",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/coredns/coredns:v1.11.1"
+      ],
+      "ip": "10.244.171.65",
+      "status": "Running",
+      "labels": {
+        "k8s-app": "kube-dns",
+        "pod-template-hash": "76f75df574"
+      },
+      "cpu_usage": 5,
+      "ram_usage": 35,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "Bojanic",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.05.01",
+      "name": "etcd-master",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/etcd:3.5.12-0"
+      ],
+      "ip": "10.244.171.45",
+      "status": "Running",
+      "labels": {
+        "component": "etcd",
+        "tier": "control-plane"
+      },
+      "cpu_usage": 2,
+      "ram_usage": 44,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "Kelvin",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2024.04.30",
+      "name": "kube-apiserver-master",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/kube-apiserver:v1.29.4"
+      ],
+      "ip": "10.244.171.31",
+      "status": "Running",
+      "labels": {
+        "component": "kube-apiserver",
+        "tier": "control-plane"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "Matheus",
-      cpu: "4",
-      mem: "8",
-      disk: "14",
-      status: "running",
-      pod: "10",
-      dateCreated: "2023.11.20",
+      "name": "kube-controller-manager-master",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/kube-controller-manager:v1.29.4"
+      ],
+      "ip": "10.244.171.39",
+      "status": "Running",
+      "labels": {
+        "component": "kube-controller-manager",
+        "tier": "control-plane"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 1,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "kanary",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.05.01",
+      "name": "kube-proxy-ml8kc",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/kube-proxy:v1.29.4"
+      ],
+      "ip": "10.244.171.36",
+      "status": "Running",
+      "labels": {
+        "controller-revision-hash": "5fbd756bc7",
+        "k8s-app": "kube-proxy",
+        "pod-template-generation": "1"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "soc",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.04.30",
+      "name": "kube-proxy-nrtqv",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/kube-proxy:v1.29.4"
+      ],
+      "ip": "10.244.171.25",
+      "status": "Running",
+      "labels": {
+        "controller-revision-hash": "5fbd756bc7",
+        "k8s-app": "kube-proxy",
+        "pod-template-generation": "1"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 0,
+      "start_time": "2024-05-03T14:15:26Z",
     },
     {
-      name: "mbhong",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2023.11.20",
-    },
-    {
-      name: "leo",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.05.01",
-    },
-    {
-      name: "uhd",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2024.04.30",
-    },
-    {
-      name: "son",
-      cpu: "Name",
-      mem: "Name",
-      disk: "Name",
-      status: "Name",
-      pod: "Name",
-      dateCreated: "2023.11.20",
+      "name": "kube-scheduler-master",
+      "namespace": "kube-system",
+      "images": [
+        "registry.k8s.io/kube-scheduler:v1.29.4"
+      ],
+      "ip": "10.244.171.22",
+      "status": "Running",
+      "labels": {
+        "component": "kube-scheduler",
+        "tier": "control-plane"
+      },
+      "cpu_usage": 8,
+      "ram_usage": 15,
+      "restarts": 1,
+      "start_time": "2024-05-03T14:15:26Z",
     },
   ];
 
-  const pageSize = 12;
+  const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "a", isChecked: false },
-    { id: 2, label: "b", isChecked: false },
-    { id: 3, label: "c", isChecked: false },
+    { id: 1, label: "nginx", isChecked: false },
+    { id: 2, label: "kube", isChecked: false },
+    { id: 3, label: "etcd", isChecked: false },
     // Add more checkboxes as needed
   ]);
 
@@ -374,6 +488,24 @@ export const Resources = () => {
                           fontSize: "12px",
                         }}
                       >
+                        NAMESPACE
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor: "#7C7C7C",
+                          color: "#292929",
+                          fontSize: "12px",
+                        }}
+                      >
+                        IP
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor: "#7C7C7C",
+                          color: "#292929",
+                          fontSize: "12px",
+                        }}
+                      >
                         CPU
                       </th>
                       <th
@@ -392,25 +524,7 @@ export const Resources = () => {
                           fontSize: "12px",
                         }}
                       >
-                        DISK
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor: "#7C7C7C",
-                          color: "#292929",
-                          fontSize: "12px",
-                        }}
-                      >
                         STATUS
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor: "#7C7C7C",
-                          color: "#292929",
-                          fontSize: "12px",
-                        }}
-                      >
-                        POD
                       </th>
                       <th
                         style={{
@@ -427,12 +541,12 @@ export const Resources = () => {
                     {currentPageData.map((row, index) => (
                       <tr key={index}>
                         <td>{row.name}</td>
-                        <td>{row.cpu}</td>
-                        <td>{row.mem}</td>
-                        <td>{row.disk}</td>
+                        <td>{row.namespace}</td>
+                        <td>{row.ip}</td>
+                        <td>{row.cpu_usage}%</td>
+                        <td>{row.ram_usage}%</td>
                         <td>{row.status}</td>
-                        <td>{row.pod}</td>
-                        <td>{row.dateCreated}</td>
+                        <td>{row.start_time}</td>
                       </tr>
                     ))}
                   </CDBTableBody>
