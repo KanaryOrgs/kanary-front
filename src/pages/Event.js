@@ -11,19 +11,19 @@ export const Event = () => {
   const events = [
     {
       created: '2024-05-01T15:30:00Z',
-      event_level: 'Server',
+      event_level: 'Error',
       name: 'nginx',
       status: 'disconnected',
-      message: 'pod "nginx" was disconnected at xx:xx : some reason',
+      message: 'Pod "nginx" was disconnected at xx:xx : some reason',
       type: 'Error'
     },
     {
       created: '2024-05-01T16:00:00Z',
-      event_level: 'Server',
+      event_level: 'Warning',
       name: 'kube-system',
       status: 'memory low',
-      message: 'pod "kube-system" is running low on memory',
-      type: 'Error'
+      message: 'Pod "kube-system" is running low on memory',
+      type: 'Warning'
     },
     {
       created: '2024-05-01T17:00:00Z',
