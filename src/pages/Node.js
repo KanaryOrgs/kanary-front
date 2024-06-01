@@ -154,15 +154,6 @@ export const Node = () => {
     setIsPopupOpen(false);
   };
 
-  // 팝업 닫기 버튼
-  const closeButtonStyle = {
-    position: "left",
-    top: "10px",
-    right: "10px",
-    cursor: "pointer",
-    color: "#FFFFFF",
-  };
-
   // 검색을 했다면 자동으로 1페이지로 바뀌게
   const handleSearch = (searchTerm) => {
     setSearchTerm(searchTerm);
@@ -345,7 +336,7 @@ export const Node = () => {
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
-                    style={closeButtonStyle}
+                    className="close-button"
                     onClick={closePopup}
                   />{" "}
                   {selectedRow.name}
@@ -539,6 +530,7 @@ class Square2 extends React.Component {
 
 class Square3 extends React.Component {
   render() {
+    
     const style = {
       width: "675px",
       height: "200px",

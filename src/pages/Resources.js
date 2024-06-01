@@ -376,14 +376,6 @@ export const Resources = () => {
     setCurrentPage(page);
   };
 
-  const closeButtonStyle = {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    cursor: "pointer",
-    color: "#FFFFFF",
-  };
-
   return (
     <div className="d-flex E">
         <div><Sidebar/></div>
@@ -583,7 +575,7 @@ export const Resources = () => {
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
-                    style={closeButtonStyle}
+                    className="close-button"
                     onClick={closePopup}
                   />{" "}
                   Select Filters

@@ -23,7 +23,13 @@
   z-index: 9999;
 }
 
-
+.close-button {
+  position: "left";
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #FFFFFF;
+}
 
 @media (max-width: 900px) {
 .popup {
@@ -34,3 +40,4 @@
 body {
 font-family: "Open Sans";
 }
+
