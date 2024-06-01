@@ -9,3 +9,28 @@
   body {
 	font-family: "Open Sans";
   }
+
+  .content-area {
+    padding: 20px 5%;
+    height: calc(100% - 64px);
+    overflow-y: scroll;
+  }
+
+  .c2 {
+    display: "grid";
+    grid-template-columns: "repeat(1, minmax(200px, 100%))";
+  }
+
+  .c-a {
+    margin-bottom: "13px";
+    display: "flex";
+    align-items: "center";
+  }
+
+  .close-button {
+    position: left;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    color: #FFFFFF;
+  }
