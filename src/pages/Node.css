@@ -23,6 +23,8 @@
   z-index: 9999;
 }
 
+
+
 @media (max-width: 900px) {
 .popup {
     max-width: 520px; /* 화면이 900px 이하일 때 최대 너비를 520px로 설정 */

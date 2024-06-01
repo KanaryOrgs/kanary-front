@@ -2,9 +2,54 @@ import React, { useState } from "react";
 import Sidebar from "../Sidebar";
 import Navbar from "../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
+import { Line } from 'react-chartjs-2';
+import { CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS } from 'chart.js/auto';
 import "./Node.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+// Sample data for the charts
+const cpuData = {
+  labels: ['00:00', '03:30', '07:00', '10:30', '14:00', '17:30', '21:00'],
+  datasets: [
+    {
+      label: '% CPU Usage',
+      data: [65, 59, 80, 81, 56, 55, 40],
+      fill: false,
+      backgroundColor: 'rgba(75,192,192,0.4)',
+      borderColor: 'rgba(75,192,192,1)',
+    },
+  ],
+};
+
+const ramData = {
+  labels: ['00:00', '03:30', '07:00', '10:30', '14:00', '17:30', '21:00'],
+  datasets: [
+    {
+      label: '% RAM Usage',
+      data: [45, 39, 60, 71, 46, 35, 30],
+      fill: false,
+      backgroundColor: 'rgba(153,102,255,0.4)',
+      borderColor: 'rgba(153,102,255,1)',
+    },
+  ],
+};
+
+
+const chartOptions = {
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      beginAtZero: true,
+    },
+    y: {
+      beginAtZero: true,
+    },
+  },
+};
 
 export const Node = () => {
   // 샘플 데이터
@@ -329,19 +374,23 @@ export const Node = () => {
                   <Square1 topLeftText="Root FS Used" progress={78.63}>
                     {78.63}%
                   </Square1>
-                  <Square2 topLeftText="CPU Core">{selectedRow.cpu}</Square2>
+                  <Square2 topLeftText="CPU Core">{selectedRow.cpu_core}</Square2>
                   <Square2 topLeftText="Uptime">
                     {15}d {4}h
                   </Square2>
                   <Square2 topLeftText="Last Data">{2} sec ago</Square2>
                   <Square2 topLeftText="Total Root FS">{14}GB</Square2>
-                  <Square2 topLeftText="Ram Total">{selectedRow.mem}GB</Square2>
+                  <Square2 topLeftText="Ram Total">{selectedRow.ram_capacity}GB</Square2>
                   <Square2 topLeftText="Total Swap">{0}B</Square2>
                   <Square3 topLeftText="% CPU Usage (Avg)">
-                    {selectedRow.cpu}
+                    <div style={{ height: '200px' }}>
+                      <Line data={cpuData} options={chartOptions} />
+                    </div>
                   </Square3>
                   <Square3 topLeftText="% Memory Usage (Avg)">
-                    {selectedRow.cpu}
+                    <div style={{ height: '200px' }}>
+                      <Line data={ramData} options={chartOptions} />
+                    </div>
                   </Square3>
                 </div>
               </div>
