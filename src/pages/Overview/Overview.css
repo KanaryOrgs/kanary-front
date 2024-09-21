@@ -8,24 +8,22 @@
 }
 
 .event-content {
-    padding: 20px;
-    flex: 0 0 auto; /* 크기 조정을 최소화 */ /* flex: none */
+    flex: 0 0 auto;
 }
 /* h2랑 p 세로로 */
 .event-header {
     display: flex;
     flex-direction: column; /* 요소들을 column 방향으로 배치 */
     align-items: flex-start !important; /* 왼쪽 정렬 */
-    max-height: none;
 }
 
 .content-section {
-    padding: 25px;
-    flex: 1 1 auto;
+    padding: 30px;
+    flex: 1 1 auto; /* 알아서 채워지게 */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc(100vh - 140px); /* 화면에 맞게 높이 조정 */
+    margin-top: -40px;
 }
 
 .card-container, .chart-container, .info-event-container {
