@@ -15,7 +15,7 @@ const Kanary = () => {
           <Route exact path="/" element={<Overview />} />
           <Route path="/topology" element={<Topology />} />
           <Route path="/node" element={<Node />} />
-          <Route path="/resources" element={<Resources />} />
+          <Route path="/resources/pods" element={<Resources />} />
           <Route path="/event" element={<Event />} />
         </Routes>
       </BrowserRouter>
