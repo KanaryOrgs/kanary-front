@@ -3,7 +3,7 @@
     flex: 1 1 auto;
     display: flex;
     flex-flow: column;
-    height: 100vh;
+    height: calc(100vh);
     overflow: hidden;
 }
 
