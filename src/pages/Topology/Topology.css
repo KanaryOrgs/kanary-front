@@ -1,0 +1,71 @@
+/* 레이아웃 및 높이 관련 */
+.main-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  height: calc(100vh);
+  overflow: auto; 
+  position: relative;
+}
+
+.event-content {
+  flex: 0 0 auto;
+}
+/* h2랑 p 세로로 */
+.event-header {
+  display: flex;
+  flex-direction: column; /* 요소들을 column 방향으로 배치 */
+  align-items: flex-start !important; /* 왼쪽 정렬 */
+}
+
+/*************** Tooltip *****************/
+
+/* tooltip 스타일 */
+#tooltip {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  padding: 10px 15px;
+  border-radius: 5px;
+  display: none;
+  z-index: 10;
+  pointer-events: auto;
+  font-size: 0.9rem;
+  color: #333;
+  max-width: 300px;
+}
+
+#tooltip h4 {
+  margin-top: 0;
+  color: #0077ff;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+#tooltip .close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/****************Dropdown****************/
+
+/* Dropdown 컨테이너 스타일 */
+.settings {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 10px;
+  padding-left: 20px;
+  margin-right: 10px;
+  gap : 20px;
+}
+
+.dropdown {
+  margin-bottom: 10px;
+  width: 200px; /* dropdown 너비 조정 */
+}
+
