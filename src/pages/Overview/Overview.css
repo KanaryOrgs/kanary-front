@@ -4,7 +4,7 @@
     display: flex;
     flex-flow: column;
     height: calc(100vh);
-    overflow: hidden;
+    overflow: hidden; /* 넘치는거 자름 */
 }
 
 .event-content {
