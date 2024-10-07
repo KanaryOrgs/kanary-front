@@ -2,12 +2,11 @@ import React, { Fragment } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Overview } from "./pages/Overview/Overview";
 import { Topology } from "./pages/Topology/Topology";
-import { Node } from "./pages/Node";
+import { Node } from "./pages/Node/Node";
 import { Resources } from "./pages/Resources";
-import { Event } from "./pages/Event"
+import { Event } from "./pages/Event";
 
 const Kanary = () => {
-
   return (
     <Fragment>
       <BrowserRouter>

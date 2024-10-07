@@ -1,0 +1,104 @@
+/* 레이아웃 및 높이 관련 */
+.main-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  height: calc(100vh);
+  overflow: hidden; /* 넘치는거 자름 */
+}
+
+.event-content {
+  flex: 0 0 auto;
+}
+/* h2랑 p 세로로 */
+.event-header {
+  display: flex;
+  flex-direction: column; /* 요소들을 column 방향으로 배치 */
+  align-items: flex-start !important; /* 왼쪽 정렬 */
+}
+
+.node-container {
+  height: 100%;
+}
+
+.content-wrapper {
+  padding: 20px 5%;
+  height: calc(100% - 64px);
+  overflow-y: scroll;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 13px;
+}
+
+.search-input {
+  padding: 10px;
+  width: 100%;
+}
+
+.table-header th {
+  background-color: #7c7c7c;
+  color: #292929;
+  font-size: 12px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #1f2838;
+  color: white;
+  margin: 0 5px;
+}
+
+.pagination-button.active {
+  background-color: #004098;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  right: 0;
+  max-width: 750px; /* 부모 요소의 너비의 60%로 지정 */
+  min-width: 430px; /* 최소 너비 */
+  height: 100%; /* 부모 요소의 높이의 100%로 지정 */
+  color: white;
+  background-color: #1f2838;
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+.popup-content {
+  overflow-y: auto;
+  max-height: calc(100vh - 15%);
+}
+
+.close-button {
+  position: "left";
+  top: 10px;
+  right: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .popup {
+    max-width: 520px; /* 화면이 900px 이하일 때 최대 너비를 520px로 설정 */
+  }
+}
+
+body {
+  font-family: "Open Sans";
+}
