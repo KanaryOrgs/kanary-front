@@ -71,6 +71,11 @@ export const PodTooltip = ({ pod, fgRef }) => {
     tooltip.style.display = "block";
     tooltip.style.left = `${x + 20}px`;
     tooltip.style.top = `${y}px`;
+    // Format the labels to display key-value pairs
+    const formattedLabels = Object.entries(pod.labels)
+      .map(([key, value]) => `"${key}": "${value}"`)
+      .join(", ");
+
     tooltip.innerHTML = `
           <div class='close' onclick='this.parentElement.style.display="none";'>&times;</div>
           <h4>${pod.name}</h4>
@@ -79,7 +84,7 @@ export const PodTooltip = ({ pod, fgRef }) => {
           <strong>Status:</strong> ${pod.status}<br/>
           <strong>CPU Usage:</strong> ${pod.cpu_usage}<br/>
           <strong>Memory Usage:</strong> ${pod.mem_usage}<br/>
-          <strong>Labels:</strong> <pre>${pod.labels}</pre>
+          <strong>Labels:</strong> <pre>[${formattedLabels}]</pre>
           <strong>Container Images:</strong> <pre>${pod.images}</pre>
           <strong>Restarts:</strong> <pre>${pod.restarts}</pre>
       `;
