@@ -4,7 +4,8 @@
   display: flex;
   flex-flow: column;
   height: calc(100vh);
-  overflow: auto; 
+  width: 100vw;
+  overflow: auto;
   position: relative;
 }
 
@@ -61,11 +62,10 @@
   margin-top: 10px;
   padding-left: 20px;
   margin-right: 10px;
-  gap : 20px;
+  gap: 20px;
 }
 
 .dropdown {
   margin-bottom: 10px;
   width: 200px; /* dropdown 너비 조정 */
 }
-

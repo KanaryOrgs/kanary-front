@@ -60,3 +60,30 @@ export const countPodStatus = (pods = []) => {
 
   return [`Error: ${Error}`, `Pending: ${Pending}`, `Running: ${Running}`];
 };
+
+/***** Topology.js *****/
+
+export const PodTooltip = ({ pod, fgRef }) => {
+  const tooltip = document.getElementById("tooltip");
+
+  if (pod && tooltip && fgRef.current) {
+    const { x, y } = fgRef.current.graph2ScreenCoords(pod.x, pod.y);
+    tooltip.style.display = "block";
+    tooltip.style.left = `${x + 20}px`;
+    tooltip.style.top = `${y}px`;
+    tooltip.innerHTML = `
+          <div class='close' onclick='this.parentElement.style.display="none";'>&times;</div>
+          <h4>${pod.name}</h4>
+          <strong>Namespace:</strong> ${pod.namespace}<br/>
+          <strong>IP:</strong> ${pod.ip}<br/>
+          <strong>Status:</strong> ${pod.status}<br/>
+          <strong>CPU Usage:</strong> ${pod.cpu_usage}<br/>
+          <strong>Memory Usage:</strong> ${pod.mem_usage}<br/>
+          <strong>Labels:</strong> <pre>${pod.labels}</pre>
+          <strong>Container Images:</strong> <pre>${pod.images}</pre>
+          <strong>Restarts:</strong> <pre>${pod.restarts}</pre>
+      `;
+  }
+
+  return null;
+};
