@@ -1,0 +1,49 @@
+.grid-wrapper {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(200px, 100%));
+}
+
+.search-filter-wrapper {
+  margin-bottom: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.search-input-resources {
+  padding-right: 10px;
+  padding-left: 10px;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.filter-box {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  background-color: #004098;
+  color: white;
+  border-radius: 4px;
+  padding: 3px 20px;
+  margin-right: 10px;
+}
+
+.button {
+  padding: 0px 20px;
+  background-color: #004098;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 30px;
+}
+
+.filter-popup {
+  overflow-y: auto;
+  max-height: "calc(100vh - 15%)";
+}
+
