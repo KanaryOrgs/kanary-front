@@ -69,9 +69,11 @@ export const Node = () => {
   };
 
   // 검색 필터링
-  const filteredData = nodes.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = nodes
+    ? nodes.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   // 필터링 된 데이터에서 현재 페이지 인덱스 범위 계산
   const startIndex = (currentPage - 1) * pageSize;
