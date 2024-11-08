@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   CDBSidebar,
   CDBSidebarContent,
@@ -12,7 +13,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
+  const location = useLocation();
   const [isResourcesOpen, setResourcesOpen] = useState(false);
+
+  // 현재 경로가 Resources의 하위 메뉴일 경우 자동으로 열림
+  useEffect(() => {
+    if (location.pathname.startsWith("/resources")) {
+      setResourcesOpen(true);
+    } else {
+      setResourcesOpen(false);
+    }
+  }, [location]);
 
   const toggleResourcesMenu = () => {
     setResourcesOpen(!isResourcesOpen);
@@ -55,7 +66,7 @@ const Sidebar = () => {
                 Resources
                 <FontAwesomeIcon
                   icon={isResourcesOpen ? faChevronUp : faChevronDown}
-                  style={{ marginLeft: "10px", paddingRight: "20px" }}
+                  style={{ marginLeft: "70px", paddingRight: "20px" }}
                 />
               </CDBSidebarMenuItem>
               {isResourcesOpen && (
