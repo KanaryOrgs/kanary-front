@@ -6,155 +6,109 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1, Square1_5, Square2, Square3 } from "../Node/Squares";
+import { fetchData, confirm } from "../Utils";
+import { useQuery } from "react-query";
 
 // 샘플 데이터
 const sampleData = [
-    {
-      name: "nginx",
-      namespace: "default",
-      clusterIp: "10.151.221.32", // ip
-      ports: "80", // 가정된 값
-      labels: "run=nginx",
-      selector: "app=nginx", // 가정된 값
+  {
+    name: "kubernetes",
+    namespace: "default",
+    clusterIP: "10.96.0.1",
+    ports: [
+      {
+        name: "https",
+        protocol: "TCP",
+        port: 443,
+      },
+    ],
+    labels: {
+      component: "apiserver",
+      provider: "kubernetes",
     },
-    {
-      name: "nginx2",
-      namespace: "nginx",
-      clusterIp: "10.24.11.231", // ip
-      ports: "80", // 가정된 값
-      labels: "run=nginx",
-      selector: "app=nginx", // 가정된 값
+    selector: null,
+  },
+  {
+    name: "testweb",
+    namespace: "default",
+    clusterIP: "10.109.175.38",
+    ports: [
+      {
+        name: "",
+        protocol: "TCP",
+        port: 8080,
+      },
+    ],
+    labels: {
+      app: "testweb",
     },
-    {
-      name: "nginx3",
-      namespace: "nginx",
-      clusterIp: "10.24.11.181", // ip
-      ports: "80", // 가정된 값
-      labels: "run=nginx",
-      selector: "app=nginx", // 가정된 값
+    selector: {
+      app: "testweb",
     },
-    {
-      name: "nginx-default",
-      namespace: "default",
-      clusterIp: "10.212.464.69", // ip
-      ports: "80", // 가정된 값
-      labels: "run=nginx",
-      selector: "app=nginx", // 가정된 값
+  },
+  {
+    name: "testweb2",
+    namespace: "default",
+    clusterIP: "10.104.157.158",
+    ports: [
+      {
+        name: "",
+        protocol: "TCP",
+        port: 8081,
+      },
+    ],
+    labels: {
+      app: "testweb2",
     },
-    {
-      name: "httpbin",
-      namespace: "default",
-      clusterIp: "10.112.473.22", // ip
-      ports: "80", // 가정된 값
-      labels: "run=pod",
-      selector: "app=httpbin", // 가정된 값
+    selector: {
+      app: "testweb2",
     },
-    {
-      name: "calico-kube-controllers-7c968b5878-frgdz",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.66", // ip
-      ports: "443", // 가정된 값
-      labels: "k8s-app=calico-kube-controllers",
-      selector: "app=calico", // 가정된 값
+  },
+  {
+    name: "kube-dns",
+    namespace: "kube-system",
+    clusterIP: "10.96.0.10",
+    ports: [
+      {
+        name: "dns",
+        protocol: "UDP",
+        port: 53,
+      },
+      {
+        name: "dns-tcp",
+        protocol: "TCP",
+        port: 53,
+      },
+      {
+        name: "metrics",
+        protocol: "TCP",
+        port: 9153,
+      },
+    ],
+    labels: {
+      "k8s-app": "kube-dns",
+      "kubernetes.io/cluster-service": "true",
+      "kubernetes.io/name": "CoreDNS",
     },
-    {
-      name: "calico-node-cccq9",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.61", // ip
-      ports: "443", // 가정된 값
-      labels: "k8s-app=calico-node",
-      selector: "app=calico", // 가정된 값
+    selector: {
+      "k8s-app": "kube-dns",
     },
-    {
-      name: "calico-node-xnwt5",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.53", // ip
-      ports: "443", // 가정된 값
-      labels: "k8s-app=calico-node",
-      selector: "app=calico", // 가정된 값
-    },
-    {
-      name: "coredns-76f75df574-tpdg5",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.67", // ip
-      ports: "53", // 가정된 값
-      labels: "k8s-app=kube-dns",
-      selector: "app=coredns", // 가정된 값
-    },
-    {
-      name: "coredns-76f75df574-x72z8",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.65", // ip
-      ports: "53", // 가정된 값
-      labels: "k8s-app=kube-dns",
-      selector: "app=coredns", // 가정된 값
-    },
-    {
-      name: "etcd-master",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.45", // ip
-      ports: "2379", // 가정된 값
-      labels: "component=etcd",
-      selector: "app=etcd", // 가정된 값
-    },
-    {
-      name: "kube-apiserver-master",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.31", // ip
-      ports: "6443", // 가정된 값
-      labels: "component=kube-apiserver",
-      selector: "app=kube-apiserver", // 가정된 값
-    },
-    {
-      name: "kube-controller-manager-master",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.39", // ip
-      ports: "10257", // 가정된 값
-      labels: "component=kube-controller-manager",
-      selector: "app=kube-controller-manager", // 가정된 값
-    },
-    {
-      name: "kube-proxy-ml8kc",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.36", // ip
-      ports: "10256", // 가정된 값
-      labels: "k8s-app=kube-proxy",
-      selector: "app=kube-proxy", // 가정된 값
-    },
-    {
-      name: "kube-proxy-nrtqv",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.25", // ip
-      ports: "10256", // 가정된 값
-      labels: "k8s-app=kube-proxy",
-      selector: "app=kube-proxy", // 가정된 값
-    },
-    {
-      name: "kube-scheduler-master",
-      namespace: "kube-system",
-      clusterIp: "10.244.171.22", // ip
-      ports: "10259", // 가정된 값
-      labels: "component=kube-scheduler",
-      selector: "app=kube-scheduler", // 가정된 값
-    },
-  ];
-  
-
-const statusColors = {
-  Stop: "badge-stop",
-  Running: "badge-running",
-  Pending: "badge-pending",
-};
+  },
+];
 
 export const Service = () => {
+  const {
+    data: services,
+    isLoading: loadingServices,
+    error: errorServices,
+  } = useQuery("services", () =>
+    fetchData("http://localhost:8080/v1/services")
+  );
+  confirm(loadingServices, errorServices);
   const pageSize = 8; // 최대 행 개수
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
-  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-
 
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
@@ -170,15 +124,6 @@ export const Service = () => {
 
   const closePopup = () => {
     setIsPopupOpen(false);
-  };
-
-  const openDetailPopup = (row) => {
-    setSelectedRow(row);
-    setIsDetailPopupOpen(true);
-  }
-
-  const closeDetailPopup = () => {
-    setIsDetailPopupOpen(false);
   };
 
   const handleSelectAllChange = () => {
@@ -231,16 +176,18 @@ export const Service = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = sampleData.filter((item) => {
-    const matchesSearchTerm = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const activeFilters = getActiveFilters();
-    const matchesFilters =
-      activeFilters.length === 0 ||
-      activeFilters.every((filter) => item.name.includes(filter));
-    return matchesSearchTerm && matchesFilters;
-  });
+  const filteredData = services
+    ? services.filter((item) => {
+        const matchesSearchTerm = item.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const activeFilters = getActiveFilters();
+        const matchesFilters =
+          activeFilters.length === 0 ||
+          activeFilters.every((filter) => item.name.includes(filter));
+        return matchesSearchTerm && matchesFilters;
+      })
+    : [];
 
   // 필터링 된 데이터에서 현재 페이지 인덱스 범위 계산
   const startIndex = (currentPage - 1) * pageSize;
@@ -317,19 +264,51 @@ export const Service = () => {
                   </CDBTableHeader>
                   <CDBTableBody>
                     {currentPageData.map((row, index) => (
-                      <tr key={index} onClick={() => openDetailPopup(row)}>
+                      <tr key={index}>
                         <td>{row.name}</td>
                         <td>{row.namespace}</td>
-                        <td>{row.clusterIp}</td>
-                        <td>{row.ports}%</td>
-                        <td>{row.labels}%</td>
-                        <td>{row.selector}%</td>
+                        <td>{row.clusterIP}</td>
                         <td>
-                          <span className={`badge ${statusColors[row.status]}`}>
-                            {row.status}
-                          </span>
+                          {Array.isArray(row.ports) ? (
+                            row.ports.map((port, i) => (
+                              <span key={i}>
+                                {port.port}/{port.protocol}
+                                {i < row.ports.length - 1 ? ", " : ""}
+                              </span>
+                            ))
+                          ) : (
+                            <span>{row.ports}</span>
+                          )}
                         </td>
-                        <td>{row.start_time}</td>
+                        <td>
+                          {row.labels
+                            ? Object.entries(row.labels).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i < Object.entries(row.labels).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
+                            : "<none>"}
+                        </td>
+
+                        <td>
+                          {row.selector
+                            ? Object.entries(row.selector).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i < Object.entries(row.selector).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
+                            : "<none>"}
+                        </td>
                       </tr>
                     ))}
                   </CDBTableBody>
@@ -387,29 +366,6 @@ export const Service = () => {
                 </div>
               </div>
             )}
-            {isDetailPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closeDetailPopup}
-                  />
-                  {selectedRow.name}
-                </h2>
-                <div className="popup-content">
-                  <Square1_5 topLeftText="Protocol">
-                    {selectedRow.protocol}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Port">
-                    {selectedRow.ports}
-                  </Square1_5>
-                </div>
-              </div>
-            )}
-            <footer className="footer">
-              <div className="d-flex align-items-center"></div>
-            </footer>
           </div>
         </div>
       </div>

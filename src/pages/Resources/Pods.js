@@ -3,34 +3,12 @@ import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
-import { Line } from "react-chartjs-2";
 import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { chartOptions } from "../Chart";
-import { Square1_5, Square3 } from "../Node/Squares";
+import { Square1_5 } from "../Node/Squares";
 import { fetchData, confirm } from "../Utils";
-
-// 샘플 데이터
-const sampleData = [
-  {
-    name: "nginx-pod",
-    namespace: "nginx",
-    ip: "10.244.0.104",
-    images: ["nginx"],
-    status: "Running",
-    cpu_usage: 0,
-    mem_usage: 6,
-    labels: {
-      run: "nginx-pod",
-    },
-    restarts: 7,
-    node_name: "minikube",
-    start_time: "2024-10-07T06:47:12Z",
-    volumes: ["kube-api-access-9g8df"],
-  },
-];
 
 const statusColors = {
   Stop: "badge-stop",
@@ -245,11 +223,18 @@ export const Pods = () => {
                           </span>
                         </td>
                         <td>
-                          {Object.entries(row.labels).map(([key, value]) => (
-                            <span key={key}>
-                              {key}: {value}
-                            </span>
-                          ))}
+                          {row.labels
+                            ? Object.entries(row.labels).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i < Object.entries(row.labels).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
+                            : "<none>"}
                         </td>
                         <td>{row.restarts}</td>
                       </tr>

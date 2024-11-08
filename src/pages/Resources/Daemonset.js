@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -6,171 +7,8 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1, Square1_5, Square2, Square3 } from "../Node/Squares";
-
-// 샘플 데이터
-const sampleData = [
-  {
-    name: "nginx",
-    namespace: "default",
-    images: ["nginx"], // images 배열
-    labels: "run=nginx", // labels
-    current: 3, // 가정된 값
-    ready: 3, // 가정된 값
-    available: 3, // 가정된 값
-    node_selector: "app=nginx", // 가정된 값
-  },
-  {
-    name: "nginx2",
-    namespace: "nginx",
-    images: ["nginx"], // images 배열
-    labels: "run=nginx", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=nginx", // 가정된 값
-  },
-  {
-    name: "nginx3",
-    namespace: "nginx",
-    images: ["nginx"], // images 배열
-    labels: "run=nginx", // labels
-    current: 3, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=nginx", // 가정된 값
-  },
-  {
-    name: "nginx-default",
-    namespace: "default",
-    images: ["nginx"], // images 배열
-    labels: "run=nginx", // labels
-    current: 3, // 가정된 값
-    ready: 3, // 가정된 값
-    available: 3, // 가정된 값
-    node_selector: "app=nginx", // 가정된 값
-  },
-  {
-    name: "httpbin",
-    namespace: "default",
-    images: ["kennethreitz/httpbin"], // images 배열
-    labels: "run=pod", // labels
-    current: 1, // 가정된 값
-    ready: 0, // 가정된 값
-    available: 0, // 가정된 값
-    node_selector: "app=httpbin", // 가정된 값
-  },
-  {
-    name: "calico-kube-controllers-7c968b5878-frgdz",
-    namespace: "kube-system",
-    images: ["docker.io/calico/kube-controllers:v3.26.4"], // images 배열
-    labels: "k8s-app=calico-kube-controllers", // labels
-    current: 3, // 가정된 값
-    ready: 3, // 가정된 값
-    available: 3, // 가정된 값
-    node_selector: "app=calico", // 가정된 값
-  },
-  {
-    name: "calico-node-cccq9",
-    namespace: "kube-system",
-    images: ["docker.io/calico/node:v3.26.4"], // images 배열
-    labels: "k8s-app=calico-node", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=calico", // 가정된 값
-  },
-  {
-    name: "calico-node-xnwt5",
-    namespace: "kube-system",
-    images: ["docker.io/calico/node:v3.26.4"], // images 배열
-    labels: "k8s-app=calico-node", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=calico", // 가정된 값
-  },
-  {
-    name: "coredns-76f75df574-tpdg5",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/coredns/coredns:v1.11.1"], // images 배열
-    labels: "k8s-app=kube-dns", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=coredns", // 가정된 값
-  },
-  {
-    name: "coredns-76f75df574-x72z8",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/coredns/coredns:v1.11.1"], // images 배열
-    labels: "k8s-app=kube-dns", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=coredns", // 가정된 값
-  },
-  {
-    name: "etcd-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/etcd:3.5.12-0"], // images 배열
-    labels: "component=etcd", // labels
-    current: 1, // 가정된 값
-    ready: 1, // 가정된 값
-    available: 1, // 가정된 값
-    node_selector: "app=etcd", // 가정된 값
-  },
-  {
-    name: "kube-apiserver-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-apiserver:v1.29.4"], // images 배열
-    labels: "component=kube-apiserver", // labels
-    current: 1, // 가정된 값
-    ready: 1, // 가정된 값
-    available: 1, // 가정된 값
-    node_selector: "app=kube-apiserver", // 가정된 값
-  },
-  {
-    name: "kube-controller-manager-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-controller-manager:v1.29.4"], // images 배열
-    labels: "component=kube-controller-manager", // labels
-    current: 1, // 가정된 값
-    ready: 1, // 가정된 값
-    available: 1, // 가정된 값
-    node_selector: "app=kube-controller-manager", // 가정된 값
-  },
-  {
-    name: "kube-proxy-ml8kc",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-proxy:v1.29.4"], // images 배열
-    labels: "k8s-app=kube-proxy", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=kube-proxy", // 가정된 값
-  },
-  {
-    name: "kube-proxy-nrtqv",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-proxy:v1.29.4"], // images 배열
-    labels: "k8s-app=kube-proxy", // labels
-    current: 2, // 가정된 값
-    ready: 2, // 가정된 값
-    available: 2, // 가정된 값
-    node_selector: "app=kube-proxy", // 가정된 값
-  },
-  {
-    name: "kube-scheduler-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-scheduler:v1.29.4"], // images 배열
-    labels: "component=kube-scheduler", // labels
-    current: 1, // 가정된 값
-    ready: 1, // 가정된 값
-    available: 1, // 가정된 값
-    node_selector: "app=kube-scheduler", // 가정된 값
-  },
-];
+import { Square1_5 } from "../Node/Squares";
+import { fetchData, confirm } from "../Utils";
 
 const statusColors = {
   Stop: "badge-stop",
@@ -183,23 +21,56 @@ export const Daemonset = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
+  const [filterPopupOpen, setFilterPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-
+  const [podDetails, setPodDetails] = useState([]);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
     { id: 1, label: "nginx", isChecked: false },
     { id: 2, label: "kube", isChecked: false },
     { id: 3, label: "etcd", isChecked: false },
-    // Add more checkboxes as needed
+    // 체크박스 추가
   ]);
+  const {
+    data: daemonsets,
+    isLoading: loadingDaemon,
+    error: errorDaemon,
+  } = useQuery("daemonsets", () =>
+    fetchData("http://localhost:8080/v1/daemonsets")
+  );
+  confirm(loadingDaemon, errorDaemon);
+
+  useEffect(() => {
+    if (!daemonsets || daemonsets.length === 0) return;
+
+    const fetchPodMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const daemonMetricsPromises = daemonsets.map(async (daemonset) => {
+        const podMetricsUrl = `http://localhost:8080/v1/daemonsets/${daemonset.namespace}/${daemonset.name}`;
+        const podMetrics = await fetchData(podMetricsUrl);
+        return {
+          ...daemonset,
+          desired: podMetrics.desired,
+          creation_time: podMetrics.creation_time,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedDaemonSets = await Promise.all(daemonMetricsPromises);
+      setPodDetails(updatedDaemonSets); // Store the updated pod details with metrics
+    };
+
+    fetchPodMetrics();
+  }, [daemonsets]);
+
+  if (loadingDaemon) return <p>Loading daemonsets...</p>;
+  if (errorDaemon) return <p>Error loading daemonsets.</p>;
 
   const openPopup = () => {
-    setIsPopupOpen(true);
+    setFilterPopupOpen(true);
   };
-
   const closePopup = () => {
-    setIsPopupOpen(false);
+    setFilterPopupOpen(false);
   };
 
   const openDetailPopup = (row) => {
@@ -260,7 +131,7 @@ export const Daemonset = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = sampleData.filter((item) => {
+  const filteredData = podDetails.filter((item) => {
     const matchesSearchTerm = item.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -278,7 +149,6 @@ export const Daemonset = () => {
   const goToPage = (page) => {
     setCurrentPage(page);
   };
-
   return (
     <div className="d-flex E">
       <div>
@@ -288,7 +158,7 @@ export const Daemonset = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Daemonset</h2>
+            <h2>Resources-Pods</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>
@@ -335,11 +205,13 @@ export const Daemonset = () => {
                       <th>NAME</th>
                       <th>NAMESPACE</th>
                       <th>IMAGES</th>
-                      <th>LABLES</th>
+                      <th>LABELS</th>
+                      <th>DESIRED</th>
                       <th>CURRENT</th>
                       <th>READY</th>
                       <th>AVAILABLE</th>
-                      <th>NODE SELECTOR</th>
+                      <th>NODE_SELECTOR</th>
+                      <th>CREATION_TIME</th>
                     </tr>
                   </CDBTableHeader>
                   <CDBTableBody>
@@ -347,25 +219,52 @@ export const Daemonset = () => {
                       <tr key={index} onClick={() => openDetailPopup(row)}>
                         <td>{row.name}</td>
                         <td>{row.namespace}</td>
-                        <td>{row.images.join(", ")}</td>{" "}
-                        {/* images 배열을 문자열로 변환 */}
-                        <td>{row.labels}</td>
-                        <td>{row.current}</td>
-                        <td>{row.ready}</td>
-                        <td>{row.available}</td>
-                        <td>{row.node_selector}</td>
+                        <td>{row.images.join(", ")}</td>
                         <td>
+                          {row.labels
+                            ? Object.entries(row.labels).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i < Object.entries(row.labels).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
+                            : "<none>"}
+                        </td>
+                        {/* <td>
                           <span className={`badge ${statusColors[row.status]}`}>
                             {row.status}
                           </span>
+                        </td> */}
+                        <td>{row.desired}</td>
+                        <td>{row.current}</td>
+                        <td>{row.ready}</td>
+                        <td>{row.available}</td>
+                        <td>
+                          {row.node_selector
+                            ? Object.entries(row.node_selector).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i <
+                                    Object.entries(row.node_selector).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
+                            : "<none>"}
                         </td>
-                        <td>{row.start_time}</td>
+                        <td>{row.creation_time}</td>
                       </tr>
                     ))}
                   </CDBTableBody>
                 </CDBTable>
 
-                <div className="d-flex justify-content-center">
+                <div className="pagination-container">
                   {[
                     ...Array(Math.ceil(filteredData.length / pageSize)).keys(),
                   ].map((page) => (
@@ -383,7 +282,7 @@ export const Daemonset = () => {
                 </div>
               </div>
             </div>
-            {isPopupOpen && (
+            {filterPopupOpen && (
               <div className="popup">
                 <h2>
                   <FontAwesomeIcon
@@ -432,34 +331,39 @@ export const Daemonset = () => {
                   <Square1_5 topLeftText="Name Space">
                     {selectedRow.namespace}
                   </Square1_5>
+                  <Square1_5 topLeftText="IP">{selectedRow.ip}</Square1_5>
                   <Square1_5 topLeftText="Images">
-                    {selectedRow.images}
+                    {Array.isArray(selectedRow.images)
+                      ? selectedRow.images.join(", ")
+                      : selectedRow.images}
+                  </Square1_5>
+                  <Square1_5 topLeftText="Status">
+                    {selectedRow.status}
                   </Square1_5>
                   <Square1_5 topLeftText="Labels">
-                    {selectedRow.labels}
+                    {selectedRow.labels
+                      ? Object.entries(selectedRow.labels)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(", ")
+                      : ""}
                   </Square1_5>
-                  <Square1_5 topLeftText="Desired">
-                    {selectedRow.desired}
+                  <Square1_5 topLeftText="Restarts">
+                    {selectedRow.restarts}
                   </Square1_5>
-                  <Square1_5 topLeftText="Current">
-                    {selectedRow.current}
+                  <Square1_5 topLeftText="Node Name">
+                    {selectedRow.node_name}
                   </Square1_5>
-                  <Square1_5 topLeftText="Ready">{selectedRow.ready}</Square1_5>
-                  <Square1_5 topLeftText="Available">
-                    {selectedRow.available}
+                  <Square1_5 topLeftText="Start Time">
+                    {selectedRow.start_time}
                   </Square1_5>
-                  <Square1_5 topLeftText="Node Selector">
-                    {selectedRow.node_selector}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Creation Time">
-                    {selectedRow.creation_time}
+                  <Square1_5 topLeftText="Volumes">
+                    {Array.isArray(selectedRow.volumes)
+                      ? selectedRow.volumes.join(", ")
+                      : selectedRow.volumes}
                   </Square1_5>
                 </div>
               </div>
             )}
-            <footer className="footer">
-              <div className="d-flex align-items-center"></div>
-            </footer>
           </div>
         </div>
       </div>
