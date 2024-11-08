@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -8,278 +9,26 @@ import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { chartOptions } from "../Chart";
-import { Square1, Square1_5, Square2, Square3 } from "../Node/Squares";
-
-// Sample data for the charts
-const cpuData = {
-  labels: ["00:00", "03:30", "07:00", "10:30", "14:00", "17:30", "21:00"],
-  datasets: [
-    {
-      label: "% CPU Usage",
-      data: [65, 59, 80, 81, 56, 55, 40],
-      fill: false,
-      backgroundColor: "rgba(75,192,192,0.4)",
-      borderColor: "rgba(75,192,192,1)",
-    },
-  ],
-};
-
-const ramData = {
-  labels: ["00:00", "03:30", "07:00", "10:30", "14:00", "17:30", "21:00"],
-  datasets: [
-    {
-      label: "% RAM Usage",
-      data: [45, 39, 60, 71, 46, 35, 30],
-      fill: false,
-      backgroundColor: "rgba(153,102,255,0.4)",
-      borderColor: "rgba(153,102,255,1)",
-    },
-  ],
-};
+import { Square1_5, Square3 } from "../Node/Squares";
+import { fetchData, confirm } from "../Utils";
 
 // 샘플 데이터
 const sampleData = [
   {
-    name: "nginx",
-    namespace: "default",
-    ip: "10.151.221.32",
-    images: ["nginx"],
-    status: "Running",
-    cpu_usage: 3,
-    ram_usage: 7,
-    labels: {
-      run: "nginx",
-    },
-    restarts: 0,
-    node_name: "worker",
-    start_time: "2024-05-22T11:04:56Z",
-    volumes: ["kube-api-access-jmlkn"],
-  },
-  {
-    name: "nginx2",
+    name: "nginx-pod",
     namespace: "nginx",
+    ip: "10.244.0.104",
     images: ["nginx"],
-    ip: "10.24.11.231",
     status: "Running",
+    cpu_usage: 0,
+    mem_usage: 6,
     labels: {
-      run: "nginx",
+      run: "nginx-pod",
     },
-    cpu_usage: 3,
-    ram_usage: 12,
-    restarts: 0,
-    start_time: "2024-05-22T11:06:56Z",
-  },
-
-  {
-    name: "nginx3",
-    namespace: "nginx",
-    images: ["nginx"],
-    ip: "10.24.11.181",
-    status: "Running",
-    labels: {
-      run: "nginx",
-    },
-    cpu_usage: 9,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-22T11:08:56Z",
-  },
-  {
-    name: "nginx-default",
-    namespace: "default",
-    images: ["nginx"],
-    ip: "10.212.464.69",
-    status: "Running",
-    labels: {
-      run: "nginx",
-    },
-    cpu_usage: 4,
-    ram_usage: 7,
-    restarts: 0,
-    start_time: "2024-05-21T06:04:51Z",
-  },
-  {
-    name: "httpbin",
-    namespace: "default",
-    images: ["kennethreitz/httpbin"],
-    ip: "10.112.473.22",
-    status: "Pending",
-    labels: {
-      run: "pod",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-28T04:02:56Z",
-  },
-  {
-    name: "calico-kube-controllers-7c968b5878-frgdz",
-    namespace: "kube-system",
-    images: ["docker.io/calico/kube-controllers:v3.26.4"],
-    ip: "10.244.171.66",
-    status: "Running",
-    labels: {
-      "k8s-app": "calico-kube-controllers",
-      "pod-template-hash": "7c968b5878",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "calico-node-cccq9",
-    namespace: "kube-system",
-    images: ["docker.io/calico/node:v3.26.4"],
-    ip: "10.244.171.61",
-    status: "Running",
-    labels: {
-      "controller-revision-hash": "7489b54556",
-      "k8s-app": "calico-node",
-      "pod-template-generation": "1",
-    },
-    cpu_usage: 8,
-    ram_usage: 12,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "calico-node-xnwt5",
-    namespace: "kube-system",
-    images: ["docker.io/calico/node:v3.26.4"],
-    ip: "10.244.171.53",
-    status: "Running",
-    labels: {
-      "controller-revision-hash": "7489b54556",
-      "k8s-app": "calico-node",
-      "pod-template-generation": "1",
-    },
-    cpu_usage: 8,
-    ram_usage: 7,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "coredns-76f75df574-tpdg5",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/coredns/coredns:v1.11.1"],
-    ip: "10.244.171.67",
-    status: "Running",
-    labels: {
-      "k8s-app": "kube-dns",
-      "pod-template-hash": "76f75df574",
-    },
-    cpu_usage: 2,
-    ram_usage: 20,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "coredns-76f75df574-x72z8",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/coredns/coredns:v1.11.1"],
-    ip: "10.244.171.65",
-    status: "Running",
-    labels: {
-      "k8s-app": "kube-dns",
-      "pod-template-hash": "76f75df574",
-    },
-    cpu_usage: 5,
-    ram_usage: 35,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "etcd-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/etcd:3.5.12-0"],
-    ip: "10.244.171.45",
-    status: "Running",
-    labels: {
-      component: "etcd",
-      tier: "control-plane",
-    },
-    cpu_usage: 2,
-    ram_usage: 44,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "kube-apiserver-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-apiserver:v1.29.4"],
-    ip: "10.244.171.31",
-    status: "Running",
-    labels: {
-      component: "kube-apiserver",
-      tier: "control-plane",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "kube-controller-manager-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-controller-manager:v1.29.4"],
-    ip: "10.244.171.39",
-    status: "Running",
-    labels: {
-      component: "kube-controller-manager",
-      tier: "control-plane",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 1,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "kube-proxy-ml8kc",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-proxy:v1.29.4"],
-    ip: "10.244.171.36",
-    status: "Running",
-    labels: {
-      "controller-revision-hash": "5fbd756bc7",
-      "k8s-app": "kube-proxy",
-      "pod-template-generation": "1",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "kube-proxy-nrtqv",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-proxy:v1.29.4"],
-    ip: "10.244.171.25",
-    status: "Running",
-    labels: {
-      "controller-revision-hash": "5fbd756bc7",
-      "k8s-app": "kube-proxy",
-      "pod-template-generation": "1",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 0,
-    start_time: "2024-05-03T14:15:26Z",
-  },
-  {
-    name: "kube-scheduler-master",
-    namespace: "kube-system",
-    images: ["registry.k8s.io/kube-scheduler:v1.29.4"],
-    ip: "10.244.171.22",
-    status: "Running",
-    labels: {
-      component: "kube-scheduler",
-      tier: "control-plane",
-    },
-    cpu_usage: 8,
-    ram_usage: 15,
-    restarts: 1,
-    start_time: "2024-05-03T14:15:26Z",
+    restarts: 7,
+    node_name: "minikube",
+    start_time: "2024-10-07T06:47:12Z",
+    volumes: ["kube-api-access-9g8df"],
   },
 ];
 
@@ -289,34 +38,68 @@ const statusColors = {
   Pending: "badge-pending",
 };
 
-export const Resources = () => {
+export const Pods = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
+  const [filterPopupOpen, setFilterPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-
+  const [podDetails, setPodDetails] = useState([]);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
     { id: 1, label: "nginx", isChecked: false },
     { id: 2, label: "kube", isChecked: false },
     { id: 3, label: "etcd", isChecked: false },
-    // Add more checkboxes as needed
+    // 체크박스 추가
   ]);
+  const {
+    data: pods,
+    isLoading: loadingPods,
+    error: errorPods,
+  } = useQuery("pods", () => fetchData("http://localhost:8080/v1/pods"));
+  confirm(loadingPods, errorPods);
+
+  useEffect(() => {
+    if (!pods || pods.length === 0) return;
+
+    const fetchPodMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const podMetricsPromises = pods.map(async (pod) => {
+        const podMetricsUrl = `http://localhost:8080/v1/pods/${pod.namespace}/${pod.name}`;
+        const podMetrics = await fetchData(podMetricsUrl);
+        return {
+          ...pod,
+          cpu_usage: podMetrics.cpu_usage || 0, // Add default values if needed
+          mem_usage: podMetrics.mem_usage || 0,
+          node_name: podMetrics.node_name,
+          start_time: podMetrics.start_time,
+          volumes: podMetrics.volumes,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedPods = await Promise.all(podMetricsPromises);
+      setPodDetails(updatedPods); // Store the updated pod details with metrics
+    };
+
+    fetchPodMetrics();
+  }, [pods]);
+
+  if (loadingPods) return <p>Loading pods...</p>;
+  if (errorPods) return <p>Error loading pods.</p>;
 
   const openPopup = () => {
-    setIsPopupOpen(true);
+    setFilterPopupOpen(true);
   };
-
   const closePopup = () => {
-    setIsPopupOpen(false);
+    setFilterPopupOpen(false);
   };
 
   const openDetailPopup = (row) => {
     setSelectedRow(row);
     setIsDetailPopupOpen(true);
-  }
+  };
 
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
@@ -371,7 +154,7 @@ export const Resources = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = sampleData.filter((item) => {
+  const filteredData = podDetails.filter((item) => {
     const matchesSearchTerm = item.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -389,7 +172,6 @@ export const Resources = () => {
   const goToPage = (page) => {
     setCurrentPage(page);
   };
-
   return (
     <div className="d-flex E">
       <div>
@@ -446,10 +228,9 @@ export const Resources = () => {
                       <th>NAME</th>
                       <th>NAMESPACE</th>
                       <th>IP</th>
-                      <th>CPU</th>
-                      <th>MEM</th>
                       <th>STATUS</th>
-                      <th>DATE CREATED</th>
+                      <th>LABELS</th>
+                      <th>RESTARTS</th>
                     </tr>
                   </CDBTableHeader>
                   <CDBTableBody>
@@ -458,20 +239,25 @@ export const Resources = () => {
                         <td>{row.name}</td>
                         <td>{row.namespace}</td>
                         <td>{row.ip}</td>
-                        <td>{row.cpu_usage}%</td>
-                        <td>{row.ram_usage}%</td>
                         <td>
                           <span className={`badge ${statusColors[row.status]}`}>
                             {row.status}
                           </span>
                         </td>
-                        <td>{row.start_time}</td>
+                        <td>
+                          {Object.entries(row.labels).map(([key, value]) => (
+                            <span key={key}>
+                              {key}: {value}
+                            </span>
+                          ))}
+                        </td>
+                        <td>{row.restarts}</td>
                       </tr>
                     ))}
                   </CDBTableBody>
                 </CDBTable>
 
-                <div className="d-flex justify-content-center">
+                <div className="pagination-container">
                   {[
                     ...Array(Math.ceil(filteredData.length / pageSize)).keys(),
                   ].map((page) => (
@@ -489,7 +275,7 @@ export const Resources = () => {
                 </div>
               </div>
             </div>
-            {isPopupOpen && (
+            {filterPopupOpen && (
               <div className="popup">
                 <h2>
                   <FontAwesomeIcon
@@ -523,7 +309,7 @@ export const Resources = () => {
                 </div>
               </div>
             )}
-            
+
             {isDetailPopupOpen && (
               <div className="popup">
                 <h2>
@@ -538,46 +324,39 @@ export const Resources = () => {
                   <Square1_5 topLeftText="Name Space">
                     {selectedRow.namespace}
                   </Square1_5>
-                  <Square1_5 topLeftText="IP">
-                    {selectedRow.ip}
-                  </Square1_5>
+                  <Square1_5 topLeftText="IP">{selectedRow.ip}</Square1_5>
                   <Square1_5 topLeftText="Images">
-                    {selectedRow.ip}
+                    {Array.isArray(selectedRow.images)
+                      ? selectedRow.images.join(", ")
+                      : selectedRow.images}
                   </Square1_5>
                   <Square1_5 topLeftText="Status">
                     {selectedRow.status}
                   </Square1_5>
-                  <Square1_5 topLeftText="Lables">
-                    {selectedRow.status}
+                  <Square1_5 topLeftText="Labels">
+                    {selectedRow.labels
+                      ? Object.entries(selectedRow.labels)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(", ")
+                      : ""}
                   </Square1_5>
                   <Square1_5 topLeftText="Restarts">
-                    {selectedRow.status}
+                    {selectedRow.restarts}
                   </Square1_5>
                   <Square1_5 topLeftText="Node Name">
-                    {selectedRow.status}
+                    {selectedRow.node_name}
                   </Square1_5>
                   <Square1_5 topLeftText="Start Time">
-                    {selectedRow.status}
+                    {selectedRow.start_time}
                   </Square1_5>
                   <Square1_5 topLeftText="Volumes">
-                    {selectedRow.volumes}
+                    {Array.isArray(selectedRow.volumes)
+                      ? selectedRow.volumes.join(", ")
+                      : selectedRow.volumes}
                   </Square1_5>
-                  <Square3 topLeftText="% CPU Usage (Avg)">
-                    <div style={{ height: "200px" }}>
-                      <Line data={cpuData} options={chartOptions} />
-                    </div>
-                  </Square3>
-                  <Square3 topLeftText="% Memory Usage (Avg)">
-                    <div style={{ height: "200px" }}>
-                      <Line data={ramData} options={chartOptions} />
-                    </div>
-                  </Square3>
                 </div>
               </div>
             )}
-            <footer className="footer">
-              <div className="d-flex align-items-center"></div>
-            </footer>
           </div>
         </div>
       </div>

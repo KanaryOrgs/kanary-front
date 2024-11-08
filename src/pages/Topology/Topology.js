@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { ForceGraph2D } from "react-force-graph";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import "./Topology.css";
