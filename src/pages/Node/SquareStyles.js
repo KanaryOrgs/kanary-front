@@ -61,6 +61,17 @@ export const styles = {
     fontWeight: props.topLeftFontWeight || "bold",
   }),
 
+  // Square1_5 스타일
+  square1_5Container: {
+    width: "215px",
+    height: "100px",
+    backgroundColor: "#3D4657",
+    display: "inline-block",
+    position: "relative",
+    borderRadius: "4px",
+    margin: "15px 15px 0 0",
+  },
+
   // Square2 스타일
   square2Container: {
     width: "100px",

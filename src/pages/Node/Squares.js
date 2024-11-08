@@ -25,6 +25,24 @@ export class Square1 extends React.Component {
   }
 }
 
+// Square1_5 컴포넌트
+export class Square1_5 extends React.Component {
+  render() {
+    return (
+      <div style={styles.square1_5Container}>
+        {/* 왼쪽 위에 텍스트 */}
+        <div style={styles.getTopLeftTextStyle(this.props)}>
+          {this.props.topLeftText}
+        </div>
+        {/* 가운데에 텍스트 */}
+        <div style={styles.getCenterTextStyle(this.props)}>
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
+}
+
 // Square2 컴포넌트
 export class Square2 extends React.Component {
   render() {

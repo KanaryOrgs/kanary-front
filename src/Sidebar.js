@@ -8,6 +8,8 @@ import {
   CDBSidebarMenuItem,
 } from "cdbreact";
 import { NavLink } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
   const [isResourcesOpen, setResourcesOpen] = useState(false);
@@ -51,6 +53,10 @@ const Sidebar = () => {
                 style={{ cursor: "pointer" }}
               >
                 Resources
+                <FontAwesomeIcon
+                  icon={isResourcesOpen ? faChevronUp : faChevronDown}
+                  style={{ marginLeft: "10px", paddingRight: "20px" }}
+                />
               </CDBSidebarMenuItem>
               {isResourcesOpen && (
                 <div style={{ paddingLeft: "20px" }}>

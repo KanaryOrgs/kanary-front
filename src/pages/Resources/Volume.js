@@ -6,139 +6,143 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Square1, Square1_5, Square2, Square3 } from "../Node/Squares";
 
 // 샘플 데이터
 const sampleData = [
-    {
-      name: "nginx",
-      capacity: "10Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "run=nginx",
-    },
-    {
-      name: "nginx2",
-      capacity: "10Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "run=nginx",
-    },
-    {
-      name: "nginx3",
-      capacity: "15Gi", // 가정된 값
-      accessMode: "ReadWriteMany", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Running",
-      labels: "run=nginx",
-    },
-    {
-      name: "nginx-default",
-      capacity: "10Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "run=nginx",
-    },
-    {
-      name: "httpbin",
-      capacity: "5Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Pending",
-      labels: "run=pod",
-    },
-    {
-      name: "calico-kube-controllers-7c968b5878-frgdz",
-      capacity: "20Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "k8s-app=calico-kube-controllers,pod-template-hash=7c968b5878",
-    },
-    {
-      name: "calico-node-cccq9",
-      capacity: "20Gi", // 가정된 값
-      accessMode: "ReadWriteMany", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
-    },
-    {
-      name: "calico-node-xnwt5",
-      capacity: "20Gi", // 가정된 값
-      accessMode: "ReadWriteMany", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
-    },
-    {
-      name: "coredns-76f75df574-tpdg5",
-      capacity: "5Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Running",
-      labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
-    },
-    {
-      name: "coredns-76f75df574-x72z8",
-      capacity: "5Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Running",
-      labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
-    },
-    {
-      name: "etcd-master",
-      capacity: "30Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "component=etcd,tier=control-plane",
-    },
-    {
-      name: "kube-apiserver-master",
-      capacity: "25Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "component=kube-apiserver,tier=control-plane",
-    },
-    {
-      name: "kube-controller-manager-master",
-      capacity: "25Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "component=kube-controller-manager,tier=control-plane",
-    },
-    {
-      name: "kube-proxy-ml8kc",
-      capacity: "10Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Running",
-      labels: "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
-    },
-    {
-      name: "kube-proxy-nrtqv",
-      capacity: "10Gi", // 가정된 값
-      accessMode: "ReadWriteOnce", // 가정된 값
-      reclaimPolicy: "Delete", // 가정된 값
-      status: "Running",
-      labels: "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
-    },
-    {
-      name: "kube-scheduler-master",
-      capacity: "15Gi", // 가정된 값
-      accessMode: "ReadWriteMany", // 가정된 값
-      reclaimPolicy: "Retain", // 가정된 값
-      status: "Running",
-      labels: "component=kube-scheduler,tier=control-plane",
-    },
-  ];
-  
+  {
+    name: "nginx",
+    capacity: "10Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "run=nginx",
+  },
+  {
+    name: "nginx2",
+    capacity: "10Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "run=nginx",
+  },
+  {
+    name: "nginx3",
+    capacity: "15Gi", // 가정된 값
+    accessMode: "ReadWriteMany", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Running",
+    labels: "run=nginx",
+  },
+  {
+    name: "nginx-default",
+    capacity: "10Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "run=nginx",
+  },
+  {
+    name: "httpbin",
+    capacity: "5Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Pending",
+    labels: "run=pod",
+  },
+  {
+    name: "calico-kube-controllers-7c968b5878-frgdz",
+    capacity: "20Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "k8s-app=calico-kube-controllers,pod-template-hash=7c968b5878",
+  },
+  {
+    name: "calico-node-cccq9",
+    capacity: "20Gi", // 가정된 값
+    accessMode: "ReadWriteMany", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels:
+      "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
+  },
+  {
+    name: "calico-node-xnwt5",
+    capacity: "20Gi", // 가정된 값
+    accessMode: "ReadWriteMany", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels:
+      "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
+  },
+  {
+    name: "coredns-76f75df574-tpdg5",
+    capacity: "5Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Running",
+    labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
+  },
+  {
+    name: "coredns-76f75df574-x72z8",
+    capacity: "5Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Running",
+    labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
+  },
+  {
+    name: "etcd-master",
+    capacity: "30Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "component=etcd,tier=control-plane",
+  },
+  {
+    name: "kube-apiserver-master",
+    capacity: "25Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "component=kube-apiserver,tier=control-plane",
+  },
+  {
+    name: "kube-controller-manager-master",
+    capacity: "25Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "component=kube-controller-manager,tier=control-plane",
+  },
+  {
+    name: "kube-proxy-ml8kc",
+    capacity: "10Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Running",
+    labels:
+      "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
+  },
+  {
+    name: "kube-proxy-nrtqv",
+    capacity: "10Gi", // 가정된 값
+    accessMode: "ReadWriteOnce", // 가정된 값
+    reclaimPolicy: "Delete", // 가정된 값
+    status: "Running",
+    labels:
+      "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
+  },
+  {
+    name: "kube-scheduler-master",
+    capacity: "15Gi", // 가정된 값
+    accessMode: "ReadWriteMany", // 가정된 값
+    reclaimPolicy: "Retain", // 가정된 값
+    status: "Running",
+    labels: "component=kube-scheduler,tier=control-plane",
+  },
+];
 
 const statusColors = {
   Stop: "badge-stop",
@@ -150,7 +154,10 @@ export const Volume = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
+  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
+
 
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
@@ -166,6 +173,15 @@ export const Volume = () => {
 
   const closePopup = () => {
     setIsPopupOpen(false);
+  };
+
+  const openDetailPopup = (row) => {
+    setSelectedRow(row);
+    setIsDetailPopupOpen(true);
+  }
+
+  const closeDetailPopup = () => {
+    setIsDetailPopupOpen(false);
   };
 
   const handleSelectAllChange = () => {
@@ -299,18 +315,17 @@ export const Volume = () => {
                   </CDBTableHeader>
                   <CDBTableBody>
                     {currentPageData.map((row, index) => (
-                      <tr key={index}>
+                      <tr key={index} onClick={() => openDetailPopup(row)}>
                         <td>{row.name}</td>
                         <td>{row.capacity}</td>
                         <td>{row.accessMode}</td>
                         <td>{row.reclaimPolicy}%</td>
-                        <td>{row.status}%</td>
-                        <td>{row.labels}%</td>
                         <td>
                           <span className={`badge ${statusColors[row.status]}`}>
                             {row.status}
                           </span>
                         </td>
+                        <td>{row.labels}%</td>
                         <td>{row.start_time}</td>
                       </tr>
                     ))}

@@ -47,3 +47,18 @@
   max-height: "calc(100vh - 15%)";
 }
 
+.badge-stop {
+  background-color: #ffc2c8;
+  color: red;
+}
+
+.badge-running {
+  background-color: rgb(197, 255, 197);
+  color: green;
+}
+
+.badge-pending {
+  background-color: #fff1c7;
+  color: rgb(141, 110, 0)
+}
+
