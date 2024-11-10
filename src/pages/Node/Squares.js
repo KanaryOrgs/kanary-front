@@ -78,3 +78,21 @@ export class Square3 extends React.Component {
     );
   }
 }
+
+// Square4 컴포넌트
+export class Square4 extends React.Component {
+  render() {
+    return (
+      <div style={styles.square3Container}>
+        {/* 왼쪽 위에 텍스트 */}
+        <div style={styles.getTopLeftTextStyle(this.props)}>
+          {this.props.topLeftText}
+        </div>
+        {/* 왼쪽 가운데에 텍스트 */}
+        <div style={styles.getCenterLeftTextStyle(this.props)}>
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
+}

@@ -7,7 +7,7 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1_5 } from "../Node/Squares";
+import { Square1_5, Square4 } from "../Node/Squares";
 import { fetchData, confirm } from "../Utils";
 
 const statusColors = {
@@ -310,20 +310,8 @@ export const Pods = () => {
                     {selectedRow.namespace}
                   </Square1_5>
                   <Square1_5 topLeftText="IP">{selectedRow.ip}</Square1_5>
-                  <Square1_5 topLeftText="Images">
-                    {Array.isArray(selectedRow.images)
-                      ? selectedRow.images.join(", ")
-                      : selectedRow.images}
-                  </Square1_5>
                   <Square1_5 topLeftText="Status">
                     {selectedRow.status}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Labels">
-                    {selectedRow.labels
-                      ? Object.entries(selectedRow.labels)
-                          .map(([key, value]) => `${key}: ${value}`)
-                          .join(", ")
-                      : ""}
                   </Square1_5>
                   <Square1_5 topLeftText="Restarts">
                     {selectedRow.restarts}
@@ -334,11 +322,23 @@ export const Pods = () => {
                   <Square1_5 topLeftText="Start Time">
                     {selectedRow.start_time}
                   </Square1_5>
-                  <Square1_5 topLeftText="Volumes">
+                  <Square4 topLeftText="Images">
+                    {Array.isArray(selectedRow.images)
+                      ? selectedRow.images.join(", ")
+                      : selectedRow.images}
+                  </Square4>
+                  <Square4 topLeftText="Labels">
+                    {selectedRow.labels
+                      ? Object.entries(selectedRow.labels)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(", ")
+                      : ""}
+                  </Square4>
+                  <Square4 topLeftText="Volumes">
                     {Array.isArray(selectedRow.volumes)
                       ? selectedRow.volumes.join(", ")
                       : selectedRow.volumes}
-                  </Square1_5>
+                  </Square4>
                 </div>
               </div>
             )}

@@ -60,6 +60,15 @@ export const styles = {
     fontSize: props.centerFontSize || "18px",
     fontWeight: props.topLeftFontWeight || "bold",
   }),
+  getCenterLeftTextStyle: (props) => ({
+    position: "absolute",
+    top: "50%",
+    left: "10px",
+    transform: "translate(-50%, -50%)",
+    color: props.centerColor || "#45828E",
+    fontSize: props.centerFontSize || "18px",
+    fontWeight: props.topLeftFontWeight || "bold",
+  }),
 
   // Square1_5 스타일
   square1_5Container: {
