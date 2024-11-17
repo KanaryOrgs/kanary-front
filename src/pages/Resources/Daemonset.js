@@ -7,7 +7,7 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1_5 } from "../Node/Squares";
+
 import { fetchData, confirm } from "../Utils";
 
 const statusColors = {
@@ -158,7 +158,7 @@ export const Daemonset = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Pods</h2>
+            <h2>Daemonset</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>
@@ -313,54 +313,6 @@ export const Daemonset = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {isDetailPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closeDetailPopup}
-                  />
-                  {selectedRow.name}
-                </h2>
-                <div className="popup-content">
-                  <Square1_5 topLeftText="Name Space">
-                    {selectedRow.namespace}
-                  </Square1_5>
-                  <Square1_5 topLeftText="IP">{selectedRow.ip}</Square1_5>
-                  <Square1_5 topLeftText="Images">
-                    {Array.isArray(selectedRow.images)
-                      ? selectedRow.images.join(", ")
-                      : selectedRow.images}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Status">
-                    {selectedRow.status}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Labels">
-                    {selectedRow.labels
-                      ? Object.entries(selectedRow.labels)
-                          .map(([key, value]) => `${key}: ${value}`)
-                          .join(", ")
-                      : ""}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Restarts">
-                    {selectedRow.restarts}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Node Name">
-                    {selectedRow.node_name}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Start Time">
-                    {selectedRow.start_time}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Volumes">
-                    {Array.isArray(selectedRow.volumes)
-                      ? selectedRow.volumes.join(", ")
-                      : selectedRow.volumes}
-                  </Square1_5>
                 </div>
               </div>
             )}

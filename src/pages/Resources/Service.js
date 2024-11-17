@@ -9,93 +9,6 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { fetchData, confirm } from "../Utils";
 import { useQuery } from "react-query";
 
-// 샘플 데이터
-const sampleData = [
-  {
-    name: "kubernetes",
-    namespace: "default",
-    clusterIP: "10.96.0.1",
-    ports: [
-      {
-        name: "https",
-        protocol: "TCP",
-        port: 443,
-      },
-    ],
-    labels: {
-      component: "apiserver",
-      provider: "kubernetes",
-    },
-    selector: null,
-  },
-  {
-    name: "testweb",
-    namespace: "default",
-    clusterIP: "10.109.175.38",
-    ports: [
-      {
-        name: "",
-        protocol: "TCP",
-        port: 8080,
-      },
-    ],
-    labels: {
-      app: "testweb",
-    },
-    selector: {
-      app: "testweb",
-    },
-  },
-  {
-    name: "testweb2",
-    namespace: "default",
-    clusterIP: "10.104.157.158",
-    ports: [
-      {
-        name: "",
-        protocol: "TCP",
-        port: 8081,
-      },
-    ],
-    labels: {
-      app: "testweb2",
-    },
-    selector: {
-      app: "testweb2",
-    },
-  },
-  {
-    name: "kube-dns",
-    namespace: "kube-system",
-    clusterIP: "10.96.0.10",
-    ports: [
-      {
-        name: "dns",
-        protocol: "UDP",
-        port: 53,
-      },
-      {
-        name: "dns-tcp",
-        protocol: "TCP",
-        port: 53,
-      },
-      {
-        name: "metrics",
-        protocol: "TCP",
-        port: 9153,
-      },
-    ],
-    labels: {
-      "k8s-app": "kube-dns",
-      "kubernetes.io/cluster-service": "true",
-      "kubernetes.io/name": "CoreDNS",
-    },
-    selector: {
-      "k8s-app": "kube-dns",
-    },
-  },
-];
-
 export const Service = () => {
   const {
     data: services,
@@ -210,7 +123,7 @@ export const Service = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Service</h2>
+            <h2>Service</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>

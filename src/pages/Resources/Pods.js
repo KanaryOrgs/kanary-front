@@ -159,7 +159,7 @@ export const Pods = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Pods</h2>
+            <h2>Pods</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>
