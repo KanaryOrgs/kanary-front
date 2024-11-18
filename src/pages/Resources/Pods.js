@@ -214,29 +214,22 @@ export const Pods = () => {
                   <CDBTableBody>
                     {currentPageData.map((row, index) => (
                       <tr key={index} onClick={() => openDetailPopup(row)}>
-                        <td>{row.name}</td>
-                        <td>{row.namespace}</td>
-                        <td>{row.ip}</td>
-                        <td>
+                        <td className="table-cell-ellipsis">{row.name}</td>
+                        <td className="table-cell-ellipsis">{row.namespace}</td>
+                        <td className="table-cell-ellipsis">{row.ip}</td>
+                        <td className="table-cell-ellipsis">
                           <span className={`badge ${statusColors[row.status]}`}>
                             {row.status}
                           </span>
                         </td>
-                        <td>
+                        <td className="table-cell-ellipsis">
                           {row.labels
-                            ? Object.entries(row.labels).map(
-                                ([key, value], i) => (
-                                  <span key={i}>
-                                    {key}: {value}
-                                    {i < Object.entries(row.labels).length - 1
-                                      ? ", "
-                                      : ""}
-                                  </span>
-                                )
-                              )
+                            ? Object.entries(row.labels)
+                                .map(([key, value], i) => `${key}: ${value}`)
+                                .join(", ")
                             : "<none>"}
                         </td>
-                        <td>{row.restarts}</td>
+                        <td className="table-cell-ellipsis">{row.restarts}</td>
                       </tr>
                     ))}
                   </CDBTableBody>

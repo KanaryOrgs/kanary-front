@@ -83,7 +83,7 @@ export class Square3 extends React.Component {
 export class Square4 extends React.Component {
   render() {
     return (
-      <div style={styles.square3Container}>
+      <div style={styles.square4Container}>
         {/* 왼쪽 위에 텍스트 */}
         <div style={styles.getTopLeftTextStyle(this.props)}>
           {this.props.topLeftText}

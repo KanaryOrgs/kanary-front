@@ -63,13 +63,16 @@ export const styles = {
   getCenterLeftTextStyle: (props) => ({
     position: "absolute",
     top: "50%",
-    left: "10px",
+    left: "50%",
     transform: "translate(-50%, -50%)",
+    overflow: "hidden",
+    wordWrap: "break-word", // 자동 줄바꿈
+    whiteSpace: "normal", // 여러 줄 텍스트 허용
+    maxWidth: "calc(100% - 20px)",
     color: props.centerColor || "#45828E",
     fontSize: props.centerFontSize || "18px",
     fontWeight: props.topLeftFontWeight || "bold",
   }),
-
   // Square1_5 스타일
   square1_5Container: {
     width: "215px",
@@ -101,6 +104,19 @@ export const styles = {
     position: "relative",
     borderRadius: "4px",
     margin: "15px 15px 0 0",
+  },
+
+  // Square4 스타일
+  square4Container: {
+    width: "675px",
+    minHeight: "150px", // 최소 높이 설정 (필요에 따라 조정)
+    backgroundColor: "#3D4657",
+    display: "inline-block",
+    position: "relative",
+    borderRadius: "4px",
+    margin: "15px 15px 0 0",
+    padding: "10px", // 내용과 여백을 위한 패딩 추가
+    boxSizing: "border-box", // 패딩이 높이에 포함되도록 설정
   },
 };
 
