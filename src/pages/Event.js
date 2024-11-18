@@ -15,12 +15,13 @@ export const Event = () => {
   } = useQuery("events", () => fetchData("http://localhost:8080/v1/events"));
   confirm(loadingEvents, errorEvents);
 
-  const pageSize = 8; // 최대 행 개수
+  const pageSize = 12; // 최대 행 개수
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+  const pagesPerGroup = 10; // 한 번에 표시할 페이지 버튼 개수
   const openPopup = (row) => {
     setSelectedRow(row);
     setIsPopupOpen(true);
@@ -50,6 +51,15 @@ export const Event = () => {
 
   // 필터링 된 데이터 배열 잘라서 현재 페이지 데이터를 가져옴
   const currentPageData = filteredData.slice(startIndex, endIndex);
+  // 전체 페이지 수
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+
+  // 현재 페이지 그룹 계산
+  const currentGroup = Math.floor((currentPage - 1) / pagesPerGroup);
+
+  // 현재 그룹에 표시할 페이지 버튼 계산
+  const startPage = currentGroup * pagesPerGroup + 1;
+  const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
 
   // 테이블 페이지 버튼
   const goToPage = (page) => {
@@ -106,19 +116,41 @@ export const Event = () => {
             </CDBTable>
 
             <div className="pagination-container">
-              {[...Array(Math.ceil(filteredData.length / pageSize)).keys()].map(
-                (page) => (
+              {/* 이전 그룹으로 이동 */}
+              {currentGroup > 0 && (
+                <button
+                  onClick={() => goToPage(startPage - pagesPerGroup)}
+                  className="pagination-button"
+                >
+                  &laquo;
+                </button>
+              )}
+
+              {/* 현재 그룹의 페이지 버튼 */}
+              {[...Array(endPage - startPage + 1).keys()].map((i) => {
+                const page = startPage + i;
+                return (
                   <button
                     key={page}
-                    onClick={() => goToPage(page + 1)}
-                    disabled={currentPage === page + 1}
+                    onClick={() => goToPage(page)}
+                    disabled={currentPage === page}
                     className={`pagination-button ${
-                      currentPage === page + 1 ? "active" : ""
+                      currentPage === page ? "active" : ""
                     }`}
                   >
-                    {page + 1}
+                    {page}
                   </button>
-                )
+                );
+              })}
+
+              {/* 다음 그룹으로 이동 */}
+              {endPage < totalPages && (
+                <button
+                  onClick={() => goToPage(endPage + 1)}
+                  className="pagination-button"
+                >
+                  &raquo;
+                </button>
               )}
             </div>
           </div>
@@ -128,4 +160,4 @@ export const Event = () => {
   );
 };
 
-export default Node;
+export default Event;
