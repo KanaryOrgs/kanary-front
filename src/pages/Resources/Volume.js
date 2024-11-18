@@ -6,141 +6,163 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1, Square1_5, Square2, Square3 } from "../Node/Squares";
+import { Square1, Square1_5, Square2, Square3, Square4 } from "../Node/Squares";
 
 // 샘플 데이터
-const sampleData = [
+const persistentVolumeData = [
   {
-    name: "nginx",
-    capacity: "10Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
+    name: "nginx-pv",
+    capacity: { storage: "10Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Retain",
     status: "Running",
-    labels: "run=nginx",
+    labels: { app: "nginx" },
+    creationTime: "2023-08-10T14:12:03Z",
+    storageClass: "standard",
   },
   {
-    name: "nginx2",
-    capacity: "10Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "run=nginx",
-  },
-  {
-    name: "nginx3",
-    capacity: "15Gi", // 가정된 값
-    accessMode: "ReadWriteMany", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
-    status: "Running",
-    labels: "run=nginx",
-  },
-  {
-    name: "nginx-default",
-    capacity: "10Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "run=nginx",
-  },
-  {
-    name: "httpbin",
-    capacity: "5Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
+    name: "httpbin-pv",
+    capacity: { storage: "5Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Delete",
     status: "Pending",
-    labels: "run=pod",
+    labels: { app: "httpbin" },
+    creationTime: "2023-07-15T10:05:20Z",
+    storageClass: "premium",
   },
   {
-    name: "calico-kube-controllers-7c968b5878-frgdz",
-    capacity: "20Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "k8s-app=calico-kube-controllers,pod-template-hash=7c968b5878",
+    name: "postgres-pv",
+    capacity: { storage: "20Gi" },
+    accessModes: ["ReadWriteMany"],
+    reclaimPolicy: "Retain",
+    status: "Bound",
+    labels: { app: "postgres" },
+    creationTime: "2023-06-01T08:25:10Z",
+    storageClass: "standard",
   },
   {
-    name: "calico-node-cccq9",
-    capacity: "20Gi", // 가정된 값
-    accessMode: "ReadWriteMany", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels:
-      "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
+    name: "redis-pv",
+    capacity: { storage: "8Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Delete",
+    status: "Failed",
+    labels: { app: "redis" },
+    creationTime: "2023-09-18T12:30:45Z",
+    storageClass: "fast",
   },
   {
-    name: "calico-node-xnwt5",
-    capacity: "20Gi", // 가정된 값
-    accessMode: "ReadWriteMany", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels:
-      "controller-revision-hash=7489b54556,k8s-app=calico-node,pod-template-generation=1",
+    name: "mysql-pv",
+    capacity: { storage: "15Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Retain",
+    status: "Released",
+    labels: { app: "mysql" },
+    creationTime: "2023-05-22T09:10:50Z",
+    storageClass: "standard",
   },
   {
-    name: "coredns-76f75df574-tpdg5",
-    capacity: "5Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
-    status: "Running",
-    labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
+    name: "mongo-pv",
+    capacity: { storage: "25Gi" },
+    accessModes: ["ReadWriteMany"],
+    reclaimPolicy: "Delete",
+    status: "Bound",
+    labels: { app: "mongo" },
+    creationTime: "2023-03-12T14:50:00Z",
+    storageClass: "fast",
   },
   {
-    name: "coredns-76f75df574-x72z8",
-    capacity: "5Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
-    status: "Running",
-    labels: "k8s-app=kube-dns,pod-template-hash=76f75df574",
+    name: "cassandra-pv",
+    capacity: { storage: "30Gi" },
+    accessModes: ["ReadOnlyMany"],
+    reclaimPolicy: "Retain",
+    status: "Released",
+    labels: { app: "cassandra" },
+    creationTime: "2023-10-05T16:40:30Z",
+    storageClass: "premium",
   },
   {
-    name: "etcd-master",
-    capacity: "30Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "component=etcd,tier=control-plane",
+    name: "elastic-pv",
+    capacity: { storage: "50Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Delete",
+    status: "Pending",
+    labels: { app: "elastic" },
+    creationTime: "2023-04-11T13:00:00Z",
+    storageClass: "standard",
   },
   {
-    name: "kube-apiserver-master",
-    capacity: "25Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "component=kube-apiserver,tier=control-plane",
+    name: "kafka-pv",
+    capacity: { storage: "40Gi" },
+    accessModes: ["ReadWriteMany"],
+    reclaimPolicy: "Retain",
+    status: "Bound",
+    labels: { app: "kafka" },
+    creationTime: "2023-02-08T11:15:20Z",
+    storageClass: "fast",
   },
   {
-    name: "kube-controller-manager-master",
-    capacity: "25Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
+    name: "rabbitmq-pv",
+    capacity: { storage: "10Gi" },
+    accessModes: ["ReadWriteOnce"],
+    reclaimPolicy: "Delete",
     status: "Running",
-    labels: "component=kube-controller-manager,tier=control-plane",
+    labels: { app: "rabbitmq" },
+    creationTime: "2023-01-25T17:30:10Z",
+    storageClass: "premium",
+  },
+];
+
+const persistentVolumeClaimData = [
+  {
+    name: "nginx-pvc",
+    namespace: "default",
+    volumeName: "nginx-pv",
+    accessModes: ["ReadWriteOnce"],
+    status: "Bound",
+    labels: { app: "nginx" },
+    creationTime: "2023-08-11T14:12:03Z",
+    storageRequest: { storage: "10Gi" },
   },
   {
-    name: "kube-proxy-ml8kc",
-    capacity: "10Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
-    status: "Running",
-    labels:
-      "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
+    name: "httpbin-pvc",
+    namespace: "default",
+    volumeName: "httpbin-pv",
+    accessModes: ["ReadWriteOnce"],
+    status: "Pending",
+    labels: { app: "httpbin" },
+    creationTime: "2023-07-16T10:05:20Z",
+    storageRequest: { storage: "5Gi" },
   },
   {
-    name: "kube-proxy-nrtqv",
-    capacity: "10Gi", // 가정된 값
-    accessMode: "ReadWriteOnce", // 가정된 값
-    reclaimPolicy: "Delete", // 가정된 값
-    status: "Running",
-    labels:
-      "controller-revision-hash=5fbd756bc7,k8s-app=kube-proxy,pod-template-generation=1",
+    name: "postgres-pvc",
+    namespace: "database",
+    volumeName: "postgres-pv",
+    accessModes: ["ReadWriteMany"],
+    status: "Bound",
+    labels: { app: "postgres" },
+    creationTime: "2023-06-02T08:25:10Z",
+    storageRequest: { storage: "20Gi" },
+  },
+];
+
+const storageClassData = [
+  {
+    name: "standard",
+    provisioner: "k8s.io/minikube-hostpath",
+    reclaimPolicy: "Delete",
+    allowVolumeExpansion: true,
+    labels: { tier: "standard" },
+    creationTime: "2023-01-01T00:00:00Z",
+    parameters: { type: "default" },
   },
   {
-    name: "kube-scheduler-master",
-    capacity: "15Gi", // 가정된 값
-    accessMode: "ReadWriteMany", // 가정된 값
-    reclaimPolicy: "Retain", // 가정된 값
-    status: "Running",
-    labels: "component=kube-scheduler,tier=control-plane",
+    name: "premium",
+    provisioner: "k8s.io/minikube-hostpath",
+    reclaimPolicy: "Retain",
+    allowVolumeExpansion: false,
+    labels: { tier: "premium" },
+    creationTime: "2023-02-01T00:00:00Z",
+    parameters: { type: "ssd" },
   },
 ];
 
@@ -153,11 +175,22 @@ const statusColors = {
 export const Volume = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentData, setCurrentData] = useState(persistentVolumeData);
+  const [dataType, setDataType] = useState("PersistentVolume");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
 
+  // 데이터 타입 변경 핸들러
+  const handleDataTypeChange = (type) => {
+    setDataType(type);
+    if (type === "PersistentVolume") setCurrentData(persistentVolumeData);
+    if (type === "PersistentVolumeClaim")
+      setCurrentData(persistentVolumeClaimData);
+    if (type === "StorageClass") setCurrentData(storageClassData);
+    setSearchTerm(""); // 검색어 초기화
+  };
 
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
@@ -178,7 +211,7 @@ export const Volume = () => {
   const openDetailPopup = (row) => {
     setSelectedRow(row);
     setIsDetailPopupOpen(true);
-  }
+  };
 
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
@@ -233,7 +266,7 @@ export const Volume = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = sampleData.filter((item) => {
+  const filteredData = currentData.filter((item) => {
     const matchesSearchTerm = item.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -270,6 +303,37 @@ export const Volume = () => {
           <div className="content-wrapper">
             <div className="grid-wrapper">
               <div className="mt-5">
+                {/* 데이터 타입 선택 버튼 */}
+                <div className="button-group">
+                  <button
+                    onClick={() => handleDataTypeChange("PersistentVolume")}
+                    className={`data-type-button ${
+                      dataType === "PersistentVolume" ? "data-type-active" : ""
+                    }`}
+                  >
+                    Persistent Volume
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleDataTypeChange("PersistentVolumeClaim")
+                    }
+                    className={`data-type-button ${
+                      dataType === "PersistentVolumeClaim"
+                        ? "data-type-active"
+                        : ""
+                    }`}
+                  >
+                    Persistent Volume Claim
+                  </button>
+                  <button
+                    onClick={() => handleDataTypeChange("StorageClass")}
+                    className={`data-type-button ${
+                      dataType === "StorageClass" ? "data-type-active" : ""
+                    }`}
+                  >
+                    Storage Class
+                  </button>
+                </div>
                 <div className="search-filter-wrapper">
                   <div className="filter-container">
                     {getActiveFilters().map(
@@ -305,28 +369,103 @@ export const Volume = () => {
                 <CDBTable responsive>
                   <CDBTableHeader>
                     <tr className="table-header">
-                      <th>NAME</th>
-                      <th>CAPACITY</th>
-                      <th>ACCESS MODE</th>
-                      <th>RECLAIM POLICY</th>
-                      <th>STATUS</th>
-                      <th>LABLES</th>
+                      {dataType === "PersistentVolume" && (
+                        <>
+                          <th>NAME</th>
+                          <th>CAPACITY</th>
+                          <th>ACCESS MODE</th>
+                          <th>RECLAIM POLICY</th>
+                          <th>STATUS</th>
+                          <th>LABELS</th>
+                        </>
+                      )}
+                      {dataType === "PersistentVolumeClaim" && (
+                        <>
+                          <th>NAME</th>
+                          <th>NAMESPACE</th>
+                          <th>VOLUME NAME</th>
+                          <th>ACCESS MODES</th>
+                          <th>STATUS</th>
+                          <th>LABELS</th>
+                        </>
+                      )}
+                      {dataType === "StorageClass" && (
+                        <>
+                          <th>NAME</th>
+                          <th>PROVISIONER</th>
+                          <th>RECLAIM POLICY</th>
+                          <th>ALLOW EXPANSION</th>
+                          <th>LABELS</th>
+                        </>
+                      )}
                     </tr>
                   </CDBTableHeader>
                   <CDBTableBody>
                     {currentPageData.map((row, index) => (
                       <tr key={index} onClick={() => openDetailPopup(row)}>
-                        <td>{row.name}</td>
-                        <td>{row.capacity}</td>
-                        <td>{row.accessMode}</td>
-                        <td>{row.reclaimPolicy}%</td>
-                        <td>
-                          <span className={`badge ${statusColors[row.status]}`}>
-                            {row.status}
-                          </span>
-                        </td>
-                        <td>{row.labels}%</td>
-                        <td>{row.start_time}</td>
+                        <td className="table-cell-ellipsis">{row.name}</td>
+                        {dataType === "PersistentVolume" && (
+                          <>
+                            <td className="table-cell-ellipsis">
+                              {row.capacity.storage}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.accessModes.join(", ")}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.reclaimPolicy}
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${statusColors[row.status]}`}
+                              >
+                                {row.status}
+                              </span>
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {JSON.stringify(row.labels)}
+                            </td>
+                          </>
+                        )}
+                        {dataType === "PersistentVolumeClaim" && (
+                          <>
+                            <td className="table-cell-ellipsis">
+                              {row.namespace}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.volumeName}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.accessModes.join(", ")}
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${statusColors[row.status]}`}
+                              >
+                                {row.status}
+                              </span>
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {JSON.stringify(row.labels)}
+                            </td>
+                          </>
+                        )}
+                        {dataType === "StorageClass" && (
+                          <>
+                            <td className="table-cell-ellipsis">
+                              {row.provisioner}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.reclaimPolicy}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.allowVolumeExpansion ? "Yes" : "No"}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {JSON.stringify(row.labels)}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </CDBTableBody>
@@ -381,6 +520,129 @@ export const Volume = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+            {isDetailPopupOpen && (
+              <div className="popup">
+                <h2>
+                  <FontAwesomeIcon
+                    icon={faTimes}
+                    className="close-button"
+                    onClick={closeDetailPopup}
+                  />
+                  {selectedRow.name}
+                </h2>
+                <div className="popup-content">
+                  {dataType === "PersistentVolume" && selectedRow && (
+                    <>
+                      <Square1_5 topLeftText="Name">
+                        {selectedRow.name}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Capacity">
+                        {selectedRow.capacity
+                          ? selectedRow.capacity.storage
+                          : ""}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Access Modes">
+                        {selectedRow.accessModes
+                          ? selectedRow.accessModes.join(", ")
+                          : ""}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Reclaim Policy">
+                        {selectedRow.reclaimPolicy}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Status">
+                        {selectedRow.status}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Storage Class">
+                        {selectedRow.storageClass}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Creation Time">
+                        {selectedRow.creationTime}
+                      </Square1_5>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels
+                          ? Object.entries(selectedRow.labels)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")
+                          : ""}
+                      </Square4>
+                    </>
+                  )}
+
+                  {dataType === "PersistentVolumeClaim" && selectedRow && (
+                    <>
+                      <Square1_5 topLeftText="Name">
+                        {selectedRow.name}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Namespace">
+                        {selectedRow.namespace}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Volume Name">
+                        {selectedRow.volumeName}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Access Modes">
+                        {selectedRow.accessModes
+                          ? selectedRow.accessModes.join(", ")
+                          : ""}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Status">
+                        {selectedRow.status}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Creation Time">
+                        {selectedRow.creationTime}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Storage Request">
+                        {selectedRow.storageRequest
+                          ? Object.entries(selectedRow.storageRequest)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")
+                          : ""}
+                      </Square1_5>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels
+                          ? Object.entries(selectedRow.labels)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")
+                          : ""}
+                      </Square4>
+                    </>
+                  )}
+
+                  {dataType === "StorageClass" && selectedRow && (
+                    <>
+                      <Square1_5 topLeftText="Name">
+                        {selectedRow.name}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Provisioner">
+                        {selectedRow.provisioner}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Reclaim Policy">
+                        {selectedRow.reclaimPolicy}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Allow Volume Expansion">
+                        {selectedRow.allowVolumeExpansion ? "Yes" : "No"}
+                      </Square1_5>
+                      <Square1_5 topLeftText="Creation Time">
+                        {selectedRow.creationTime}
+                      </Square1_5>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels
+                          ? Object.entries(selectedRow.labels)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")
+                          : ""}
+                      </Square4>
+                      <Square4 topLeftText="Parameters">
+                        {selectedRow.parameters
+                          ? Object.entries(selectedRow.parameters)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")
+                          : ""}
+                      </Square4>
+                    </>
+                  )}
                 </div>
               </div>
             )}
