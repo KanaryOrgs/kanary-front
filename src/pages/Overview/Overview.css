@@ -1,108 +1,89 @@
 /* 레이아웃 및 높이 관련 */
 .main-content {
-    flex: 1 1 auto;
-    display: flex;
-    flex-flow: column;
-    height: calc(100vh);
-    overflow: hidden; /* 넘치는거 자름 */
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  height: calc(100vh);
+  overflow: hidden; /* 넘치는거 자름 */
 }
 
 .event-content {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 }
 /* h2랑 p 세로로 */
 .event-header {
-    display: flex;
-    flex-direction: column; /* 요소들을 column 방향으로 배치 */
-    align-items: flex-start !important; /* 왼쪽 정렬 */
+  display: flex;
+  flex-direction: column; /* 요소들을 column 방향으로 배치 */
+  align-items: flex-start !important; /* 왼쪽 정렬 */
 }
 
 .content-section {
-    padding: 30px;
-    flex: 1 1 auto; /* 알아서 채워지게 */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    margin-top: -40px;
+  padding: 30px;
+  flex: 1 1 auto; /* 알아서 채워지게 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: -40px;
 }
 
-.card-container, .chart-container, .info-event-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+.event-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  flex: 1;
+  margin-right: 20px;
+  max-height: 220px;
+  overflow: auto; /* event 길어질 수 있어서 auto로 함*/
+  flex-grow: 2.16;
 }
 
-.card-container, .info-event-container {
-    flex: 1;
+.card-container,
+.chart-container,
+.info-event-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.card-container,
+.info-event-container {
+  flex: 1;
 }
 
 .event-warning {
-    color: #d9534f;
+  color: #020202;
 }
 
 /************ 카드 **************/
 
 /* 카드 한번에 모았으 */
 .status-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    flex: 1;
-    margin-right: 20px;
-    max-height: 175px;
-}
-
-.info-cards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    flex: 1;
-    gap: 10px;
-    margin-right: 20px;
-    max-height: 230px;
-}
-
-.event-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    flex: 1;
-    margin-right: 20px;
-    max-height: 230px;
-    overflow: auto; /* event 길어질 수 있어서 auto로 함*/
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  flex: 1;
+  margin-right: 20px;
+  max-height: 220px;
+  flex-grow: 1;
 }
 
 /* 각 카드가 2행 2열로 배치되도록 크기를 50% 이하로 설정 */
 .top-card {
-    background-color: #fff;
-    padding: 10px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    flex: 1 1 calc(35%);
-    max-height: 100px;
-    overflow: auto; /* pod 이름 길어질 수 있어서 auto */
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  flex: 1 1 calc(35%);
+  max-height: 100px;
+  overflow: auto; /* pod 이름 길어질 수 있어서 auto */
 }
-
-/* max-height 때문에 따로 뺌*/
-.chart-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    flex: 1;
-    margin-right: 20px;
-    max-height: 260px;
-    overflow: hidden; /* 스크롤 없앰 */
-}
-
 
 /* 마지막 카드 margin-right 제거 */
-.status-card:last-child, .chart-card:last-child, .top-card:last-child, .event-card:last-child {
-    margin-right: 0;
+.status-card:last-child,
+.chart-card:last-child,
+.top-card:last-child,
+.event-card:last-child {
+  margin-right: 0;
 }
