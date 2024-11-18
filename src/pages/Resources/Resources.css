@@ -32,6 +32,44 @@
   margin-right: 10px;
 }
 
+.button {
+  padding: 0px 20px;
+  background-color: #004098;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 30px;
+}
+
+.button-group {
+  display: flex;
+}
+
+.data-type-button {
+  padding: 0px 20px;
+  border: 0px solid #004098;
+  border-radius: 0px 4px 0px 0px;
+  background-color: transparent;
+  color: #004098;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.data-type-button:hover {
+  background-color: #e0f0ff;
+}
+
+.data-type-active {
+  background-color: #004098;
+  color: #fff;
+}
+
+.data-type-button:not(.data-type-active) {
+  opacity: 0.6;
+}
+
 .pagination-button {
   background-color: #f5f5f5;
   color: #000000;
