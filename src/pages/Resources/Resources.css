@@ -32,14 +32,35 @@
   margin-right: 10px;
 }
 
-.button {
-  padding: 0px 20px;
-  background-color: #004098;
-  color: white;
-  border: none;
+.pagination-button {
+  background-color: #f5f5f5;
+  color: #000000;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  padding: 8px 12px;
   cursor: pointer;
-  height: 30px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.pagination-button:hover {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.pagination-button.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #0056b3;
+  pointer-events: none;
+}
+
+.pagination-button:disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  border-color: #ddd;
+  cursor: not-allowed;
 }
 
 .filter-popup {
@@ -60,4 +81,8 @@
 .badge-pending {
   background-color: #fff1c7;
   color: rgb(141, 110, 0);
+}
+.badge-succeeded {
+  background-color: #fff1c7;
+  color: rgb(16, 22, 83);
 }

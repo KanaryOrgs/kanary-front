@@ -14,6 +14,7 @@ const statusColors = {
   Stop: "badge-stop",
   Running: "badge-running",
   Pending: "badge-pending",
+  Succeeded: "badge-succeeded",
 };
 
 export const Pods = () => {

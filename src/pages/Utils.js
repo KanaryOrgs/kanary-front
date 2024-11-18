@@ -47,18 +47,26 @@ export const countPodStatus = (pods = []) => {
   let Error = 0;
   let Pending = 0;
   let Running = 0;
+  let Succeeded = 0;
 
   pods.forEach((pod) => {
     if (pod.status === "Running") {
       Running++;
     } else if (pod.status === "Pending") {
       Pending++;
+    } else if (pod.status === "Succeeded") {
+      Succeeded++;
     } else {
       Error++;
     }
   });
 
-  return [`Error: ${Error}`, `Pending: ${Pending}`, `Running: ${Running}`];
+  return [
+    `Succeeded: ${Succeeded}`,
+    `Error: ${Error}`,
+    `Pending: ${Pending}`,
+    `Running: ${Running}`,
+  ];
 };
 
 /***** Topology.js *****/
