@@ -517,9 +517,6 @@ export const Job = () => {
                 <div className="popup-content">
                   {dataType === "Job" && selectedRow && (
                     <>
-                      <Square15 topLeftText="Name">
-                        {selectedRow.name}
-                      </Square15>
                       <Square15 topLeftText="Namespace">
                         {selectedRow.namespace}
                       </Square15>
