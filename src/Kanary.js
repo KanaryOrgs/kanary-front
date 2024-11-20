@@ -7,6 +7,7 @@ import { Pods } from "./pages/Resources/Pods";
 import { Volume } from "./pages/Resources/Volume";
 import { Service } from "./pages/Resources/Service";
 import { Daemonset } from "./pages/Resources/Daemonset";
+import { Job } from "./pages/Resources/Job"
 import { Event } from "./pages/Event";
 
 const Kanary = () => {
@@ -21,6 +22,7 @@ const Kanary = () => {
           <Route path="/resources/volume" element={<Volume />} />
           <Route path="/resources/service" element={<Service />} />
           <Route path="/resources/daemonset" element={<Daemonset />} />
+          <Route path="/resources/job" element={<Job />} />
           <Route path="/event" element={<Event />} />
         </Routes>
       </BrowserRouter>
