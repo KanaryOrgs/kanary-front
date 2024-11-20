@@ -7,7 +7,7 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1_5, Square4 } from "../Node/Squares";
+import { Square15, Square4 } from "../Node/Squares";
 import { fetchData, confirm } from "../Utils";
 
 const statusColors = {
@@ -300,22 +300,20 @@ export const Pods = () => {
                   {selectedRow.name}
                 </h2>
                 <div className="popup-content">
-                  <Square1_5 topLeftText="Name Space">
+                  <Square15 topLeftText="Name Space">
                     {selectedRow.namespace}
-                  </Square1_5>
-                  <Square1_5 topLeftText="IP">{selectedRow.ip}</Square1_5>
-                  <Square1_5 topLeftText="Status">
-                    {selectedRow.status}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Restarts">
+                  </Square15>
+                  <Square15 topLeftText="IP">{selectedRow.ip}</Square15>
+                  <Square15 topLeftText="Status">{selectedRow.status}</Square15>
+                  <Square15 topLeftText="Restarts">
                     {selectedRow.restarts}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Node Name">
+                  </Square15>
+                  <Square15 topLeftText="Node Name">
                     {selectedRow.node_name}
-                  </Square1_5>
-                  <Square1_5 topLeftText="Start Time">
+                  </Square15>
+                  <Square15 topLeftText="Start Time">
                     {selectedRow.start_time}
-                  </Square1_5>
+                  </Square15>
                   <Square4 topLeftText="Images">
                     {Array.isArray(selectedRow.images)
                       ? selectedRow.images.join(", ")
