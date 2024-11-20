@@ -124,3 +124,11 @@
   background-color: #fff1c7;
   color: rgb(16, 22, 83);
 }
+.badge-available {
+  background-color: #c8e2c4;
+  color: rgb(11, 93, 60);
+}
+.badge-bound {
+  background-color: #fff1c7;
+  color: rgb(16, 22, 83);
+}
