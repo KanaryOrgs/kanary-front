@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -6,192 +7,25 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1, Square1_5, Square2, Square3, Square4 } from "../Node/Squares";
-
-// 샘플 데이터
-const persistentVolumeData = [
-  {
-    name: "nginx-pv",
-    capacity: { storage: "10Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Retain",
-    status: "Running",
-    labels: { app: "nginx" },
-    creationTime: "2023-08-10T14:12:03Z",
-    storageClass: "standard",
-  },
-  {
-    name: "httpbin-pv",
-    capacity: { storage: "5Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Delete",
-    status: "Pending",
-    labels: { app: "httpbin" },
-    creationTime: "2023-07-15T10:05:20Z",
-    storageClass: "premium",
-  },
-  {
-    name: "postgres-pv",
-    capacity: { storage: "20Gi" },
-    accessModes: ["ReadWriteMany"],
-    reclaimPolicy: "Retain",
-    status: "Bound",
-    labels: { app: "postgres" },
-    creationTime: "2023-06-01T08:25:10Z",
-    storageClass: "standard",
-  },
-  {
-    name: "redis-pv",
-    capacity: { storage: "8Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Delete",
-    status: "Failed",
-    labels: { app: "redis" },
-    creationTime: "2023-09-18T12:30:45Z",
-    storageClass: "fast",
-  },
-  {
-    name: "mysql-pv",
-    capacity: { storage: "15Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Retain",
-    status: "Released",
-    labels: { app: "mysql" },
-    creationTime: "2023-05-22T09:10:50Z",
-    storageClass: "standard",
-  },
-  {
-    name: "mongo-pv",
-    capacity: { storage: "25Gi" },
-    accessModes: ["ReadWriteMany"],
-    reclaimPolicy: "Delete",
-    status: "Bound",
-    labels: { app: "mongo" },
-    creationTime: "2023-03-12T14:50:00Z",
-    storageClass: "fast",
-  },
-  {
-    name: "cassandra-pv",
-    capacity: { storage: "30Gi" },
-    accessModes: ["ReadOnlyMany"],
-    reclaimPolicy: "Retain",
-    status: "Released",
-    labels: { app: "cassandra" },
-    creationTime: "2023-10-05T16:40:30Z",
-    storageClass: "premium",
-  },
-  {
-    name: "elastic-pv",
-    capacity: { storage: "50Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Delete",
-    status: "Pending",
-    labels: { app: "elastic" },
-    creationTime: "2023-04-11T13:00:00Z",
-    storageClass: "standard",
-  },
-  {
-    name: "kafka-pv",
-    capacity: { storage: "40Gi" },
-    accessModes: ["ReadWriteMany"],
-    reclaimPolicy: "Retain",
-    status: "Bound",
-    labels: { app: "kafka" },
-    creationTime: "2023-02-08T11:15:20Z",
-    storageClass: "fast",
-  },
-  {
-    name: "rabbitmq-pv",
-    capacity: { storage: "10Gi" },
-    accessModes: ["ReadWriteOnce"],
-    reclaimPolicy: "Delete",
-    status: "Running",
-    labels: { app: "rabbitmq" },
-    creationTime: "2023-01-25T17:30:10Z",
-    storageClass: "premium",
-  },
-];
-
-const persistentVolumeClaimData = [
-  {
-    name: "nginx-pvc",
-    namespace: "default",
-    volumeName: "nginx-pv",
-    accessModes: ["ReadWriteOnce"],
-    status: "Bound",
-    labels: { app: "nginx" },
-    creationTime: "2023-08-11T14:12:03Z",
-    storageRequest: { storage: "10Gi" },
-  },
-  {
-    name: "httpbin-pvc",
-    namespace: "default",
-    volumeName: "httpbin-pv",
-    accessModes: ["ReadWriteOnce"],
-    status: "Pending",
-    labels: { app: "httpbin" },
-    creationTime: "2023-07-16T10:05:20Z",
-    storageRequest: { storage: "5Gi" },
-  },
-  {
-    name: "postgres-pvc",
-    namespace: "database",
-    volumeName: "postgres-pv",
-    accessModes: ["ReadWriteMany"],
-    status: "Bound",
-    labels: { app: "postgres" },
-    creationTime: "2023-06-02T08:25:10Z",
-    storageRequest: { storage: "20Gi" },
-  },
-];
-
-const storageClassData = [
-  {
-    name: "standard",
-    provisioner: "k8s.io/minikube-hostpath",
-    reclaimPolicy: "Delete",
-    allowVolumeExpansion: true,
-    labels: { tier: "standard" },
-    creationTime: "2023-01-01T00:00:00Z",
-    parameters: { type: "default" },
-  },
-  {
-    name: "premium",
-    provisioner: "k8s.io/minikube-hostpath",
-    reclaimPolicy: "Retain",
-    allowVolumeExpansion: false,
-    labels: { tier: "premium" },
-    creationTime: "2023-02-01T00:00:00Z",
-    parameters: { type: "ssd" },
-  },
-];
+import { Square15, Square4 } from "../Node/Squares";
+import { fetchData, confirm } from "../Utils";
 
 const statusColors = {
   Stop: "badge-stop",
   Running: "badge-running",
   Pending: "badge-pending",
+  Available: "badge-available",
+  Bound: "badge-bound",
 };
 
 export const Volume = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentData, setCurrentData] = useState(persistentVolumeData);
   const [dataType, setDataType] = useState("PersistentVolume");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-
-  // 데이터 타입 변경 핸들러
-  const handleDataTypeChange = (type) => {
-    setDataType(type);
-    if (type === "PersistentVolume") setCurrentData(persistentVolumeData);
-    if (type === "PersistentVolumeClaim")
-      setCurrentData(persistentVolumeClaimData);
-    if (type === "StorageClass") setCurrentData(storageClassData);
-    setSearchTerm(""); // 검색어 초기화
-  };
-
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
     { id: 1, label: "nginx", isChecked: false },
@@ -199,6 +33,157 @@ export const Volume = () => {
     { id: 3, label: "etcd", isChecked: false },
     // Add more checkboxes as needed
   ]);
+  const [data, setData] = useState([]);
+
+  const {
+    data: pvs,
+    isLoading: loadingPvs,
+    error: errorPvs,
+    refetch: refetchPvs,
+  } = useQuery("pvs", () => fetchData("http://localhost:8080/v1/pvs"), {
+    enabled: dataType === "PersistentVolume", // PersistentVolume일 때만 실행
+  });
+  confirm(loadingPvs, errorPvs);
+
+  const {
+    data: pvcs,
+    isLoading: loadingPvcs,
+    error: errorPvcs,
+    refetch: refetchPvcs,
+  } = useQuery("pvcs", () => fetchData("http://localhost:8080/v1/pvcs"), {
+    enabled: dataType === "PersistentVolumeClaim", // PersistentVolume일 때만 실행
+  });
+  confirm(loadingPvcs, errorPvcs);
+
+  const {
+    data: scs,
+    isLoading: loadingScs,
+    error: errorScs,
+    refetch: refetchScs,
+  } = useQuery(
+    "scs",
+    () => fetchData("http://localhost:8080/v1/storageclasses"),
+    {
+      enabled: dataType === "StorageClass", // PersistentVolume일 때만 실행
+    }
+  );
+  confirm(loadingScs, errorScs);
+
+  // PV
+  useEffect(() => {
+    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
+    if (dataType !== "PersistentVolume") return;
+
+    // 데이터가 없거나 로딩 중이면 실행하지 않음
+    if (!pvs || pvs.length === 0) {
+      refetchPvs(); // 데이터를 다시 가져오기 위해 refetch 호출
+      return;
+    }
+
+    const fetchPvMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const pvsMetricsPromises = pvs.map(async (pv) => {
+        const pvsMetricsUrl = `http://localhost:8080/v1/pvs/${pv.name}`;
+        const pvsMetrics = await fetchData(pvsMetricsUrl);
+        return {
+          ...pv,
+          creation_time: pvsMetrics.creation_time,
+          storage_class: pvsMetrics.storage_class,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedPvs = await Promise.all(pvsMetricsPromises);
+      setData(updatedPvs); // Store the updated pod details with metrics
+    };
+
+    fetchPvMetrics();
+  }, [dataType, pvs, refetchPvs]);
+
+  // PVC
+  useEffect(() => {
+    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
+    if (dataType !== "PersistentVolumeClaim") return;
+
+    // 데이터가 없거나 로딩 중이면 실행하지 않음
+    if (!pvcs || pvcs.length === 0) {
+      refetchPvcs(); // 데이터를 다시 가져오기 위해 refetch 호출
+      return;
+    }
+
+    const fetchPvcMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const pvcsMetricsPromises = pvcs.map(async (pvc) => {
+        const pvcsMetricsUrl = `http://localhost:8080/v1/pvcs/${pvc.namespace}/${pvc.name}`;
+        const pvcsMetrics = await fetchData(pvcsMetricsUrl);
+        return {
+          ...pvc,
+          creation_time: pvcsMetrics.creation_time,
+          storage_request: pvcsMetrics.storage_request,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedPvcs = await Promise.all(pvcsMetricsPromises);
+      setData(updatedPvcs); // Store the updated pod details with metrics
+    };
+
+    fetchPvcMetrics();
+  }, [dataType, pvcs, refetchPvcs]);
+
+  // SC
+  useEffect(() => {
+    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
+    if (dataType !== "StorageClass") return;
+
+    // 데이터가 없거나 로딩 중이면 실행하지 않음
+    if (!scs || scs.length === 0) {
+      refetchScs(); // 데이터를 다시 가져오기 위해 refetch 호출
+      return;
+    }
+
+    const fetchScMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const scsMetricsPromises = scs.map(async (sc) => {
+        const scsMetricsUrl = `http://localhost:8080/v1/storageclasses/${sc.name}`;
+        const scsMetrics = await fetchData(scsMetricsUrl);
+        return {
+          ...sc,
+          creation_time: scsMetrics.creation_time,
+          parameters: scsMetrics.parameters,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedScs = await Promise.all(scsMetricsPromises);
+      setData(updatedScs); // Store the updated pod details with metrics
+    };
+
+    fetchScMetrics();
+  }, [dataType, scs, refetchScs]);
+
+  // 데이터 타입 변경 핸들러
+  const handleDataTypeChange = (type) => {
+    setDataType(type);
+    if (type === "PersistentVolume") setData(pvs);
+    if (type === "PersistentVolumeClaim") setData(pvcs);
+    if (type === "StorageClass") setData(scs);
+    setSearchTerm(""); // 검색어 초기화
+  };
+
+  if (
+    (dataType === "PersistentVolume" && loadingPvs) ||
+    (dataType === "PersistentVolumeClaim" && loadingPvcs) ||
+    (dataType === "StorageClass" && loadingScs)
+  )
+    return <p>Loading...</p>;
+
+  if (
+    (dataType === "PersistentVolume" && errorPvs) ||
+    (dataType === "PersistentVolumeClaim" && errorPvcs) ||
+    (dataType === "StorageClass" && errorScs)
+  )
+    return <p>Error loading data.</p>;
 
   const openPopup = () => {
     setIsPopupOpen(true);
@@ -266,16 +251,18 @@ export const Volume = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = currentData.filter((item) => {
-    const matchesSearchTerm = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const activeFilters = getActiveFilters();
-    const matchesFilters =
-      activeFilters.length === 0 ||
-      activeFilters.every((filter) => item.name.includes(filter));
-    return matchesSearchTerm && matchesFilters;
-  });
+  const filteredData = data
+    ? data.filter((item) => {
+        const matchesSearchTerm = item.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const activeFilters = getActiveFilters();
+        const matchesFilters =
+          activeFilters.length === 0 ||
+          activeFilters.every((filter) => item.name.includes(filter));
+        return matchesSearchTerm && matchesFilters;
+      })
+    : [];
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
@@ -410,10 +397,10 @@ export const Volume = () => {
                               {row.capacity.storage}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.accessModes.join(", ")}
+                              {row.access_modes}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.reclaimPolicy}
+                              {row.reclaim_policy}
                             </td>
                             <td>
                               <span
@@ -423,7 +410,11 @@ export const Volume = () => {
                               </span>
                             </td>
                             <td className="table-cell-ellipsis">
-                              {JSON.stringify(row.labels)}
+                              {row.labels
+                                ? Object.entries(row.labels)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join(", ")
+                                : "<none>"}
                             </td>
                           </>
                         )}
@@ -433,10 +424,10 @@ export const Volume = () => {
                               {row.namespace}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.volumeName}
+                              {row.volume_name}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.accessModes.join(", ")}
+                              {row.access_modes.join(", ")}
                             </td>
                             <td>
                               <span
@@ -446,7 +437,11 @@ export const Volume = () => {
                               </span>
                             </td>
                             <td className="table-cell-ellipsis">
-                              {JSON.stringify(row.labels)}
+                              {row.labels
+                                ? Object.entries(row.labels)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join(", ")
+                                : "<none>"}
                             </td>
                           </>
                         )}
@@ -456,13 +451,17 @@ export const Volume = () => {
                               {row.provisioner}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.reclaimPolicy}
+                              {row.reclaim_policy}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {row.allowVolumeExpansion ? "Yes" : "No"}
+                              {row.allowVolumeExpansion ? "TRUE" : "FALSE"}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {JSON.stringify(row.labels)}
+                              {row.labels
+                                ? Object.entries(row.labels)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join(", ")
+                                : "<none>"}
                             </td>
                           </>
                         )}
@@ -536,103 +535,97 @@ export const Volume = () => {
                 <div className="popup-content">
                   {dataType === "PersistentVolume" && selectedRow && (
                     <>
-                      <Square1_5 topLeftText="Name">
-                        {selectedRow.name}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Capacity">
+                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
+                      <Square15 topLeftText="Capacity">
                         {selectedRow.capacity
                           ? selectedRow.capacity.storage
                           : ""}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Access Modes">
-                        {selectedRow.accessModes
-                          ? selectedRow.accessModes.join(", ")
+                      </Square15>
+                      <Square15 topLeftText="Access Modes">
+                        {selectedRow.access_modes
+                          ? selectedRow.access_modes.join(", ")
                           : ""}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Reclaim Policy">
-                        {selectedRow.reclaimPolicy}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Status">
+                      </Square15>
+                      <Square15 topLeftText="Reclaim Policy">
+                        {selectedRow.reclaim_policy}
+                      </Square15>
+                      <Square15 topLeftText="Status">
                         {selectedRow.status}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Storage Class">
-                        {selectedRow.storageClass}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Creation Time">
-                        {selectedRow.creationTime}
-                      </Square1_5>
+                      </Square15>
+                      <Square15 topLeftText="Storage Class">
+                        {selectedRow.storage_class}
+                      </Square15>
+                      <Square15 topLeftText="Creation Time">
+                        {selectedRow.creation_time}
+                      </Square15>
                       <Square4 topLeftText="Labels">
                         {selectedRow.labels
                           ? Object.entries(selectedRow.labels)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                     </>
                   )}
 
                   {dataType === "PersistentVolumeClaim" && selectedRow && (
                     <>
-                      <Square1_5 topLeftText="Name">
-                        {selectedRow.name}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Namespace">
+                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
+                      <Square15 topLeftText="Namespace">
                         {selectedRow.namespace}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Volume Name">
-                        {selectedRow.volumeName}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Access Modes">
-                        {selectedRow.accessModes
-                          ? selectedRow.accessModes.join(", ")
+                      </Square15>
+                      <Square15 topLeftText="Volume Name">
+                        {selectedRow.volume_name}
+                      </Square15>
+                      <Square15 topLeftText="Access Modes">
+                        {selectedRow.access_modes
+                          ? selectedRow.access_modes.join(", ")
                           : ""}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Status">
+                      </Square15>
+                      <Square15 topLeftText="Status">
                         {selectedRow.status}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Creation Time">
-                        {selectedRow.creationTime}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Storage Request">
-                        {selectedRow.storageRequest
-                          ? Object.entries(selectedRow.storageRequest)
+                      </Square15>
+                      <Square15 topLeftText="Creation Time">
+                        {selectedRow.creation_time}
+                      </Square15>
+                      <Square15 topLeftText="Storage Request">
+                        {selectedRow.storage_request
+                          ? Object.entries(selectedRow.storage_request)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
-                      </Square1_5>
+                          : "<none>"}
+                      </Square15>
                       <Square4 topLeftText="Labels">
                         {selectedRow.labels
                           ? Object.entries(selectedRow.labels)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                     </>
                   )}
 
                   {dataType === "StorageClass" && selectedRow && (
                     <>
-                      <Square1_5 topLeftText="Name">
-                        {selectedRow.name}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Provisioner">
+                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
+                      <Square15 topLeftText="Provisioner">
                         {selectedRow.provisioner}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Reclaim Policy">
-                        {selectedRow.reclaimPolicy}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Allow Volume Expansion">
+                      </Square15>
+                      <Square15 topLeftText="Reclaim Policy">
+                        {selectedRow.reclaim_policy}
+                      </Square15>
+                      <Square15 topLeftText="Allow Volume Expansion">
                         {selectedRow.allowVolumeExpansion ? "Yes" : "No"}
-                      </Square1_5>
-                      <Square1_5 topLeftText="Creation Time">
-                        {selectedRow.creationTime}
-                      </Square1_5>
+                      </Square15>
+                      <Square15 topLeftText="Creation Time">
+                        {selectedRow.creation_time}
+                      </Square15>
                       <Square4 topLeftText="Labels">
                         {selectedRow.labels
                           ? Object.entries(selectedRow.labels)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                       <Square4 topLeftText="Parameters">
                         {selectedRow.parameters
