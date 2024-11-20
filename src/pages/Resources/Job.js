@@ -335,7 +335,7 @@ export const Job = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Job</h2>
+            <h2>Job</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>
