@@ -83,6 +83,9 @@ const Sidebar = () => {
                   <NavLink exact to="/resources/daemonset" activeClassName="activeClicked">
                     <CDBSidebarMenuItem icon="tasks">Daemonset</CDBSidebarMenuItem>
                   </NavLink>
+                  <NavLink exact to="/resources/job" activeClassName="activeClicked">
+                    <CDBSidebarMenuItem icon="cogs">Job</CDBSidebarMenuItem>
+                  </NavLink>
                 </div>
               )}
             </div>
