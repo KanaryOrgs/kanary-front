@@ -86,6 +86,15 @@ const Sidebar = () => {
                   <NavLink exact to="/resources/job" activeClassName="activeClicked">
                     <CDBSidebarMenuItem icon="cogs">Job</CDBSidebarMenuItem>
                   </NavLink>
+                  <NavLink exact to="/resources/statefulset" activeClassName="activeClicked">
+                    <CDBSidebarMenuItem icon="clone">StatefulSet</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact to="/resources/ingress" activeClassName="activeClicked">
+                    <CDBSidebarMenuItem icon="route">Ingress</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact to="/resources/deployment" activeClassName="activeClicked">
+                    <CDBSidebarMenuItem icon="cloud-upload-alt">Deployment</CDBSidebarMenuItem>
+                  </NavLink>
                 </div>
               )}
             </div>
