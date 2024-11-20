@@ -15,7 +15,7 @@ export const Event = () => {
   } = useQuery("events", () => fetchData("http://localhost:8080/v1/events"));
   confirm(loadingEvents, errorEvents);
 
-  const pageSize = 12; // 최대 행 개수
+  const pageSize = 10; // 최대 행 개수
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
