@@ -25,8 +25,8 @@ export class Square1 extends React.Component {
   }
 }
 
-// Square1_5 컴포넌트
-export class Square1_5 extends React.Component {
+// Square15 컴포넌트
+export class Square15 extends React.Component {
   render() {
     return (
       <div style={styles.square1_5Container}>
