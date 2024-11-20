@@ -1,10 +1,15 @@
 // Backend에서 데이터 가져오기(fetch)
 export const fetchData = async (url) => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Network response was not ok: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Fetch failed for ${url}:`, error);
+    throw error; // 재throw해서 호출 측에서 처리 가능하도록 함
   }
-  return response.json();
 };
 
 export const confirm = (loading, error) => {
@@ -67,6 +72,19 @@ export const countPodStatus = (pods = []) => {
     `Pending: ${Pending}`,
     `Running: ${Running}`,
   ];
+};
+
+export const serviceList = (services = []) => {
+  return (
+    <div>
+      <h3>Total Services: {services.length}</h3>
+      <ul>
+        {services.map((service, index) => (
+          <li key={index}>{service.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 /***** Topology.js *****/

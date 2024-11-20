@@ -3,7 +3,13 @@ import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { useQuery } from "react-query";
 import "./Overview.css";
-import { fetchData, countNodeStatus, countPodStatus, confirm } from "../Utils";
+import {
+  fetchData,
+  countNodeStatus,
+  countPodStatus,
+  confirm,
+  serviceList,
+} from "../Utils";
 
 // Swagger UI : /swagger/index.html
 export const Overview = () => {
@@ -27,12 +33,22 @@ export const Overview = () => {
     error: errorEvents,
   } = useQuery("events", () => fetchData("http://localhost:8080/v1/events"));
 
-  confirm(loadingEvents, errorEvents);
+  const {
+    data: services,
+    isLoading: loadingServices,
+    error: errorServices,
+  } = useQuery("services", () =>
+    fetchData("http://localhost:8080/v1/services")
+  );
+
+  confirm(loadingServices, errorServices);
   confirm(loadingNodes, errorNodes);
   confirm(loadingPods, errorPods);
+  confirm(loadingEvents, errorEvents);
 
   const nodeStatus = countNodeStatus(nodes);
   const podStatus = countPodStatus(pods);
+  const serviceCount = serviceList(services);
 
   return (
     <div className="d-flex E">
@@ -53,7 +69,7 @@ export const Overview = () => {
             {/* backend와 통신할 때 이런식으로 */}
             <StatusCard title="Nodes" statuses={nodeStatus} />
             <StatusCard title="Pods" statuses={podStatus} />
-            <StatusCard title="Services" statuses={nodeStatus} />
+            <ServiceCard title="Services" services={services} />
             <StatusCard title="Daemonsets" statuses={podStatus} />
           </div>
           <div className="card-container">
@@ -82,6 +98,18 @@ const StatusCard = ({ title, statuses }) => (
     {statuses.map((status, index) => (
       <p key={index}>{status}</p>
     ))}
+  </div>
+);
+
+const ServiceCard = ({ title, services = [] }) => (
+  <div className="status-card">
+    <h4>{title}</h4>
+    <p>Total: {services.length}</p>
+    <ul>
+      {services.map((service, index) => (
+        <li key={index}>{service.name}</li>
+      ))}
+    </ul>
   </div>
 );
 
