@@ -74,19 +74,6 @@ export const countPodStatus = (pods = []) => {
   ];
 };
 
-export const serviceList = (services = []) => {
-  return (
-    <div>
-      <h3>Total Services: {services.length}</h3>
-      <ul>
-        {services.map((service, index) => (
-          <li key={index}>{service.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
 /***** Topology.js *****/
 
 export const PodTooltip = ({ pod, fgRef }) => {

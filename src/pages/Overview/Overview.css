@@ -67,6 +67,15 @@
   margin-right: 20px;
   max-height: 220px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-detail {
+  overflow: auto; /* 스크롤 활성화 */
+  max-height: 150px; /* 최대 높이 설정 */
+  margin-top: 10px; /* 상단과의 간격 추가 */
+  padding-right: 10px; /* 스크롤바와 콘텐츠 간 여백 */
 }
 
 /* 각 카드가 2행 2열로 배치되도록 크기를 50% 이하로 설정 */

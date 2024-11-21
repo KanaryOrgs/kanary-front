@@ -3,13 +3,7 @@ import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { useQuery } from "react-query";
 import "./Overview.css";
-import {
-  fetchData,
-  countNodeStatus,
-  countPodStatus,
-  confirm,
-  serviceList,
-} from "../Utils";
+import { fetchData, countNodeStatus, countPodStatus, confirm } from "../Utils";
 
 // Swagger UI : /swagger/index.html
 export const Overview = () => {
@@ -41,14 +35,78 @@ export const Overview = () => {
     fetchData("http://localhost:8080/v1/services")
   );
 
+  const {
+    data: daemonsets,
+    isLoading: loadingDaemon,
+    error: errorDaemon,
+  } = useQuery("daemonsets", () =>
+    fetchData("http://localhost:8080/v1/daemonsets")
+  );
+
+  const {
+    data: pvs,
+    isLoading: loadingPvs,
+    error: errorPvs,
+  } = useQuery("pvs", () => fetchData("http://localhost:8080/v1/pvs"));
+
+  const {
+    data: pvcs,
+    isLoading: loadingPvcs,
+    error: errorPvcs,
+  } = useQuery("pvcs", () => fetchData("http://localhost:8080/v1/pvcs"));
+
+  const {
+    data: scs,
+    isLoading: loadingScs,
+    error: errorScs,
+  } = useQuery("scs", () =>
+    fetchData("http://localhost:8080/v1/storageclasses")
+  );
+
+  const {
+    data: sfs,
+    isLoading: loadingSfs,
+    error: errorSfs,
+  } = useQuery("sfs", () => fetchData("http://localhost:8080/v1/statefulsets"));
+
+  const {
+    data: ingresses,
+    isLoading: loadingIngresses,
+    error: errorIngresses,
+  } = useQuery("ingresses", () =>
+    fetchData("http://localhost:8080/v1/ingresses")
+  );
+  const {
+    data: jobs,
+    isLoading: loadingJobs,
+    error: errorJobs,
+    refetch: refetchJobs,
+  } = useQuery("jobs", () => fetchData("http://localhost:8080/v1/jobs"));
+
+  const {
+    data: cronjobs,
+    isLoading: loadingCronjobs,
+    error: errorCronjobs,
+    refetch: refetchCronjobs,
+  } = useQuery("cronjobs", () =>
+    fetchData("http://localhost:8080/v1/cronjobs")
+  );
+
   confirm(loadingServices, errorServices);
   confirm(loadingNodes, errorNodes);
   confirm(loadingPods, errorPods);
   confirm(loadingEvents, errorEvents);
+  confirm(loadingDaemon, errorDaemon);
+  confirm(loadingPvs, errorPvs);
+  confirm(loadingPvcs, errorPvcs);
+  confirm(loadingScs, errorScs);
+  confirm(loadingSfs, errorSfs);
+  confirm(loadingIngresses, errorIngresses);
+  confirm(loadingJobs, errorJobs);
+  confirm(loadingCronjobs, errorCronjobs);
 
   const nodeStatus = countNodeStatus(nodes);
   const podStatus = countPodStatus(pods);
-  const serviceCount = serviceList(services);
 
   return (
     <div className="d-flex E">
@@ -69,20 +127,25 @@ export const Overview = () => {
             {/* backend와 통신할 때 이런식으로 */}
             <StatusCard title="Nodes" statuses={nodeStatus} />
             <StatusCard title="Pods" statuses={podStatus} />
-            <ServiceCard title="Services" services={services} />
-            <StatusCard title="Daemonsets" statuses={podStatus} />
+            <ResourceCard title="Services" resources={services} />
+            <ResourceCard title="Daemonsets" resources={daemonsets} />
           </div>
           <div className="card-container">
             {/* backend와 통신할 때 이런식으로 */}
-            <StatusCard title="PersistentVolumes" statuses={nodeStatus} />
-            <StatusCard title="PersistentVolumeClaims" statuses={podStatus} />
-            <StatusCard title="StorageClasses" statuses={podStatus} />
-            <StatusCard title="StatefulSets" statuses={podStatus} />
+            <ResourceCard title="PersistentVolumes" resources={pvs} />
+            <ResourceCard title="PersistentVolumeClaims" resources={pvcs} />
+            <ResourceCard title="StorageClasses" resources={scs} />
+            <ResourceCard title="StatefulSets" resources={sfs} />
           </div>
 
           <div className="card-container">
-            <StatusCard title="Ingresses" statuses={nodeStatus} />
-            <StatusCard title="Job/Cronjob" statuses={podStatus} />
+            <ResourceCard title="Ingresses" resources={ingresses} />
+
+            <ResourceCard
+              title="Job/Cronjob"
+              resources={[...(jobs || []), ...(cronjobs || [])]} // 두 배열 결합
+            />
+
             <EventCard events={events || []} />
           </div>
         </div>
@@ -101,15 +164,17 @@ const StatusCard = ({ title, statuses }) => (
   </div>
 );
 
-const ServiceCard = ({ title, services = [] }) => (
+const ResourceCard = ({ title, resources = [] }) => (
   <div className="status-card">
     <h4>{title}</h4>
-    <p>Total: {services.length}</p>
-    <ul>
-      {services.map((service, index) => (
-        <li key={index}>{service.name}</li>
-      ))}
-    </ul>
+    <p>Total: {resources.length}</p>
+    <div className="card-detail">
+      <ul>
+        {resources.map((resource, index) => (
+          <li key={index}>{resource.name}</li>
+        ))}
+      </ul>
+    </div>
   </div>
 );
 
