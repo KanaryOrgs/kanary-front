@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -7,109 +8,7 @@ import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Square15, Square4 } from "../Node/Squares";
-
-const sampleData = [
-  {
-    name: "deployment-1",
-    namespace: "default",
-    replicas: 3,
-    available: 2,
-    updated: 3,
-    ready: 2,
-    labels: { app: "nginx", tier: "frontend" },
-    creation_time: "2024-11-20T10:00:00Z",
-  },
-  {
-    name: "deployment-2",
-    namespace: "kube-system",
-    replicas: 2,
-    available: 1,
-    updated: 2,
-    ready: 1,
-    labels: { app: "nginx", tier: "backend" },
-    creation_time: "2024-11-19T08:30:00Z",
-  },
-  {
-    name: "deployment-3",
-    namespace: "default",
-    replicas: 4,
-    available: 3,
-    updated: 4,
-    ready: 3,
-    labels: { app: "flask", tier: "api" },
-    creation_time: "2024-11-18T12:15:00Z",
-  },
-  {
-    name: "deployment-4",
-    namespace: "default",
-    replicas: 5,
-    available: 4,
-    updated: 5,
-    ready: 4,
-    labels: { app: "react", tier: "frontend" },
-    creation_time: "2024-11-17T15:45:00Z",
-  },
-  {
-    name: "deployment-5",
-    namespace: "kube-system",
-    replicas: 3,
-    available: 2,
-    updated: 3,
-    ready: 2,
-    labels: { app: "express", tier: "backend" },
-    creation_time: "2024-11-16T09:00:00Z",
-  },
-  {
-    name: "deployment-6",
-    namespace: "default",
-    replicas: 6,
-    available: 5,
-    updated: 6,
-    ready: 5,
-    labels: { app: "vue", tier: "frontend" },
-    creation_time: "2024-11-15T10:00:00Z",
-  },
-  {
-    name: "deployment-7",
-    namespace: "default",
-    replicas: 2,
-    available: 2,
-    updated: 2,
-    ready: 2,
-    labels: { app: "django", tier: "api" },
-    creation_time: "2024-11-14T14:00:00Z",
-  },
-  {
-    name: "deployment-8",
-    namespace: "kube-system",
-    replicas: 4,
-    available: 4,
-    updated: 4,
-    ready: 4,
-    labels: { app: "flask", tier: "backend" },
-    creation_time: "2024-11-13T11:30:00Z",
-  },
-  {
-    name: "deployment-9",
-    namespace: "default",
-    replicas: 3,
-    available: 2,
-    updated: 3,
-    ready: 2,
-    labels: { app: "nodejs", tier: "frontend" },
-    creation_time: "2024-11-12T08:45:00Z",
-  },
-  {
-    name: "deployment-10",
-    namespace: "default",
-    replicas: 2,
-    available: 2,
-    updated: 2,
-    ready: 2,
-    labels: { app: "spring", tier: "api" },
-    creation_time: "2024-11-11T13:00:00Z",
-  },
-];
+import { fetchData, confirm } from "../Utils";
 
 export const Deployment = () => {
   const pageSize = 8;
@@ -117,7 +16,7 @@ export const Deployment = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false);
-  const [statefulSetDetails, setStatefulSetDetails] = useState([]);
+  const [deployDetails, setDeployDetails] = useState([]);
   const [filterPopupOpen, setFilterPopupOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
@@ -127,10 +26,38 @@ export const Deployment = () => {
     { id: 4, label: "staging", isChecked: false },
   ]);
 
+  const {
+    data: deploys,
+    isLoading: loadingDeploys,
+    error: errorDeploys,
+  } = useQuery("deploys", () =>
+    fetchData("http://localhost:8080/v1/deployments")
+  );
+  confirm(loadingDeploys, errorDeploys);
+
   useEffect(() => {
-    // 초기화 시 샘플 데이터를 사용
-    setStatefulSetDetails(sampleData);
-  }, []);
+    if (!deploys || deploys.length === 0) return;
+
+    const fetchdeployMetrics = async () => {
+      // Fetch detailed metrics for each deploy
+      const deployMetricsPromises = deploys.map(async (deploy) => {
+        const deployMetricsUrl = `http://localhost:8080/v1/deployments/${deploy.namespace}/${deploy.name}`;
+        const deployMetrics = await fetchData(deployMetricsUrl);
+        return {
+          ...deploy,
+          updated: deployMetrics.updated, // Add default values if needed
+          ready: deployMetrics.ready,
+          creation_time: deployMetrics.creation_time,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedDeploys = await Promise.all(deployMetricsPromises);
+      setDeployDetails(updatedDeploys); // Store the updated deploy details with metrics
+    };
+
+    fetchdeployMetrics();
+  }, [deploys]);
 
   const openDetailPopup = (row) => {
     setSelectedRow(row);
@@ -198,15 +125,17 @@ export const Deployment = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = statefulSetDetails.filter((item) => {
-    const matchesSearchTerm = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const activeFilters = getActiveFilters();
-    const matchesFilters =
-      activeFilters.length === 0 || activeFilters.includes(item.namespace);
-    return matchesSearchTerm && matchesFilters;
-  });
+  const filteredData = deployDetails
+    ? deployDetails.filter((item) => {
+        const matchesSearchTerm = item.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const activeFilters = getActiveFilters();
+        const matchesFilters =
+          activeFilters.length === 0 || activeFilters.includes(item.namespace);
+        return matchesSearchTerm && matchesFilters;
+      })
+    : [];
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
@@ -363,14 +292,16 @@ export const Deployment = () => {
                   <Square15 topLeftText="Available">
                     {selectedRow.available}
                   </Square15>
-                  <Square15 topLeftText="Updated">{selectedRow.updated}</Square15>
+                  <Square15 topLeftText="Updated">
+                    {selectedRow.updated}
+                  </Square15>
                   <Square15 topLeftText="Ready">{selectedRow.ready}</Square15>
                   <Square4 topLeftText="Labels">
                     {selectedRow.labels
                       ? Object.entries(selectedRow.labels)
                           .map(([key, value]) => `${key}: ${value}`)
                           .join(", ")
-                      : ""}
+                      : "<none>"}
                   </Square4>
                   <Square4 topLeftText="Creation Time">
                     {" "}

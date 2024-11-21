@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -6,71 +7,64 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square15, Square4 } from "../Node/Squares";
 
-const sampleData = [
-  {
-    name: "statefulset-1",
-    namespace: "default",
-    replicas: 3,
-    ready: 2,
-    labels: { app: "example", tier: "backend" },
-    creation_time: "2024-11-01T12:00:00Z",
-  },
-  {
-    name: "statefulset-2",
-    namespace: "kube-system",
-    replicas: 5,
-    ready: 5,
-    labels: { app: "kube-dns" },
-    creation_time: "2024-10-25T08:30:00Z",
-  },
-  {
-    name: "statefulset-3",
-    namespace: "production",
-    replicas: 4,
-    ready: 4,
-    labels: { app: "web", tier: "frontend" },
-    creation_time: "2024-10-15T10:15:00Z",
-  },
-  {
-    name: "statefulset-4",
-    namespace: "staging",
-    replicas: 2,
-    ready: 1,
-    labels: { app: "api", environment: "staging" },
-    creation_time: "2024-11-10T16:45:00Z",
-  },
-  {
-    name: "statefulset-5",
-    namespace: "default",
-    replicas: 6,
-    ready: 6,
-    labels: { app: "data-processor", role: "worker" },
-    creation_time: "2024-09-30T14:00:00Z",
-  },
-];
+import { fetchData, confirm } from "../Utils";
 
 export const StatefulSet = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false);
-  const [statefulSetDetails, setStatefulSetDetails] = useState([]);
-  const [filterPopupOpen, setFilterPopupOpen] = useState(false);
+  const [filterPopupOpen, setFilterPopupOpen] = useState(false); // 필터 팝업 상태
+  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
+  const [podDetails, setPodDetails] = useState([]);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "default", isChecked: false },
-    { id: 2, label: "kube-system", isChecked: false },
-    { id: 3, label: "production", isChecked: false },
-    { id: 4, label: "staging", isChecked: false },
+    { id: 1, label: "nginx", isChecked: false },
+    { id: 2, label: "kube", isChecked: false },
+    { id: 3, label: "etcd", isChecked: false },
+    // 체크박스 추가
   ]);
+  const {
+    data: daemonsets,
+    isLoading: loadingDaemon,
+    error: errorDaemon,
+  } = useQuery("daemonsets", () =>
+    fetchData("http://localhost:8080/v1/statefulsets")
+  );
+  confirm(loadingDaemon, errorDaemon);
 
   useEffect(() => {
-    // 초기화 시 샘플 데이터를 사용
-    setStatefulSetDetails(sampleData);
-  }, []);
+    if (!daemonsets || daemonsets.length === 0) return;
+
+    const fetchPodMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const daemonMetricsPromises = daemonsets.map(async (daemonset) => {
+        const podMetricsUrl = `http://localhost:8080/v1/statefulsets/${daemonset.namespace}/${daemonset.name}`;
+        const podMetrics = await fetchData(podMetricsUrl);
+        return {
+          ...daemonset,
+          creation_time: podMetrics.creation_time,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedDaemonSets = await Promise.all(daemonMetricsPromises);
+      setPodDetails(updatedDaemonSets); // Store the updated pod details with metrics
+    };
+
+    fetchPodMetrics();
+  }, [daemonsets]);
+
+  if (loadingDaemon) return <p>Loading daemonsets...</p>;
+  if (errorDaemon) return <p>Error loading daemonsets.</p>;
+
+  const openPopup = () => {
+    setFilterPopupOpen(true);
+  };
+  const closePopup = () => {
+    setFilterPopupOpen(false);
+  };
 
   const openDetailPopup = (row) => {
     setSelectedRow(row);
@@ -79,14 +73,6 @@ export const StatefulSet = () => {
 
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
-  };
-
-  const openPopup = () => {
-    setFilterPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setFilterPopupOpen(false);
   };
 
   const handleSelectAllChange = () => {
@@ -108,7 +94,9 @@ export const StatefulSet = () => {
     );
     setCheckboxes(updatedCheckboxes);
 
-    const allChecked = updatedCheckboxes.every((checkbox) => checkbox.isChecked);
+    const allChecked = updatedCheckboxes.every(
+      (checkbox) => checkbox.isChecked
+    );
     const noneChecked = updatedCheckboxes.every(
       (checkbox) => !checkbox.isChecked
     );
@@ -136,14 +124,14 @@ export const StatefulSet = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = statefulSetDetails.filter((item) => {
+  const filteredData = podDetails.filter((item) => {
     const matchesSearchTerm = item.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const activeFilters = getActiveFilters();
     const matchesFilters =
       activeFilters.length === 0 ||
-      activeFilters.includes(item.namespace);
+      activeFilters.every((filter) => item.name.includes(filter));
     return matchesSearchTerm && matchesFilters;
   });
 
@@ -154,7 +142,6 @@ export const StatefulSet = () => {
   const goToPage = (page) => {
     setCurrentPage(page);
   };
-
   return (
     <div className="d-flex E">
       <div>
@@ -175,16 +162,20 @@ export const StatefulSet = () => {
               <div className="mt-5">
                 <div className="search-filter-wrapper">
                   <div className="filter-container">
-                    {getActiveFilters().map((filter) => ( //필터 상자
-                      <div key={filter} className="filter-box">
-                        <span>{filter}</span>
-                        <FontAwesomeIcon
-                          icon={faTimes}
-                          className="close-icon"
-                          onClick={() => handleRemoveFilter(filter)}
-                        />
-                      </div>
-                    ))}
+                    {getActiveFilters().map(
+                      (
+                        filter // 필터 상자
+                      ) => (
+                        <div key={filter} className="filter-box">
+                          <span>{filter}</span>
+                          <FontAwesomeIcon
+                            icon={faTimes}
+                            className="close-icon"
+                            onClick={() => handleRemoveFilter(filter)}
+                          />
+                        </div>
+                      )
+                    )}
                   </div>
                   <input // 검색창
                     type="text"
@@ -193,7 +184,11 @@ export const StatefulSet = () => {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="search-input-resources"
                   />
-                  <button onClick={openPopup} className="button">
+
+                  <button // 필터 버튼
+                    onClick={openPopup}
+                    className="button"
+                  >
                     Filter
                   </button>
                 </div>
@@ -211,22 +206,31 @@ export const StatefulSet = () => {
                   <CDBTableBody>
                     {currentPageData.map((row, index) => (
                       <tr key={index} onClick={() => openDetailPopup(row)}>
-                        <td className="table-cell-ellipsis">{row.name}</td>
-                        <td className="table-cell-ellipsis">{row.namespace}</td>
-                        <td className="table-cell-ellipsis">{row.replicas}</td>
-                        <td className="table-cell-ellipsis">{row.ready}</td>
-                        <td className="table-cell-ellipsis">
+                        <td>{row.name}</td>
+                        <td>{row.namespace}</td>
+                        <td>{row.replicas}</td>
+                        <td>{row.ready}</td>
+                        <td>
                           {row.labels
-                            ? Object.entries(row.labels)
-                                .map(([key, value]) => `${key}: ${value}`)
-                                .join(", ")
+                            ? Object.entries(row.labels).map(
+                                ([key, value], i) => (
+                                  <span key={i}>
+                                    {key}: {value}
+                                    {i < Object.entries(row.labels).length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )
                             : "<none>"}
                         </td>
-                        <td className="table-cell-ellipsis">
-                          {row.creation_time
-                            ? new Date(row.creation_time).toLocaleString()
-                            : ""}
-                        </td>
+                        {/* <td>
+                          <span className={`badge ${statusColors[row.status]}`}>
+                            {row.status}
+                          </span>
+                        </td> */}
+
+                        <td>{row.creation_time}</td>
                       </tr>
                     ))}
                   </CDBTableBody>
@@ -250,7 +254,6 @@ export const StatefulSet = () => {
                 </div>
               </div>
             </div>
-
             {filterPopupOpen && (
               <div className="popup">
                 <h2>
@@ -258,62 +261,30 @@ export const StatefulSet = () => {
                     icon={faTimes}
                     className="close-button"
                     onClick={closePopup}
-                  />
+                  />{" "}
                   Select Filters
                 </h2>
-                <div>
-                  <label>
+                <div className="filter-popup">
+                  <div>
                     <input
                       type="checkbox"
                       checked={isSelectAllChecked}
                       onChange={handleSelectAllChange}
                     />
-                    Select All
-                  </label>
-                  {checkboxes.map((checkbox) => (
-                    <label key={checkbox.id}>
-                      <input
-                        type="checkbox"
-                        checked={checkbox.isChecked}
-                        onChange={() => handleCheckboxChange(checkbox.id)}
-                      />
-                      {checkbox.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {isDetailPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closeDetailPopup}
-                  />
-                  {selectedRow.name}
-                </h2>
-                <div className="popup-content">
-                  <Square15 topLeftText="Name Space">
-                    {selectedRow.namespace}
-                  </Square15>
-                  <Square15 topLeftText="Replicas">
-                    {selectedRow.replicas}
-                  </Square15>
-                  <Square15 topLeftText="Ready">{selectedRow.ready}</Square15>
-                  <Square4 topLeftText="Labels">
-                    {selectedRow.labels
-                      ? Object.entries(selectedRow.labels)
-                          .map(([key, value]) => `${key}: ${value}`)
-                          .join(", ")
-                      : ""}
-                  </Square4>
-                  <Square4 topLeftText="Creation Time"> {/* 한글로 시간 출력되게 하려면 아래와 같이 하고 Square4 쓸 것 */}
-                    {selectedRow.creation_time
-                      ? new Date(selectedRow.creation_time).toLocaleString()
-                      : ""}
-                  </Square4>
+                    <label>Select All</label>
+                  </div>
+                  <div className="checkbox-container">
+                    {checkboxes.map((checkbox) => (
+                      <div key={checkbox.id}>
+                        <input
+                          type="checkbox"
+                          checked={checkbox.isChecked}
+                          onChange={() => handleCheckboxChange(checkbox.id)}
+                        />
+                        <label>{checkbox.label}</label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

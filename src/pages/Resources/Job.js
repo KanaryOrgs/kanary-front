@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "react-query";
 import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
@@ -6,233 +7,18 @@ import "../Node/Node.css";
 import "./Resources.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Square1, Square15, Square2, Square3, Square4 } from "../Node/Squares";
-
-// 샘플 데이터
-const jobData = [
-  {
-    name: "job-1",
-    namespace: "default",
-    completions: 1,
-    active: 0,
-    failed: 0,
-    labels: { app: "example", tier: "backend" },
-    creation_time: "2024-11-18T10:00:00Z",
-  },
-  {
-    name: "job-2",
-    namespace: "kube-system",
-    completions: 2,
-    active: 1,
-    failed: 0,
-    labels: { task: "backup", environment: "production" },
-    creation_time: "2024-11-17T14:30:00Z",
-  },
-  {
-    name: "job-3",
-    namespace: "development",
-    completions: 0,
-    active: 1,
-    failed: 2,
-    labels: { project: "api-service", version: "v1.2" },
-    creation_time: "2024-11-16T09:45:00Z",
-  },
-  {
-    name: "job-4",
-    namespace: "default",
-    completions: 3,
-    active: 0,
-    failed: 1,
-    labels: { type: "analytics", priority: "high" },
-    creation_time: "2024-11-15T11:15:00Z",
-  },
-  {
-    name: "job-5",
-    namespace: "monitoring",
-    completions: 5,
-    active: 0,
-    failed: 0,
-    labels: { tool: "prometheus", team: "devops" },
-    creation_time: "2024-11-14T16:20:00Z",
-  },
-  {
-    name: "job-6",
-    namespace: "default",
-    completions: 1,
-    active: 1,
-    failed: 0,
-    labels: { role: "worker", region: "us-east" },
-    creation_time: "2024-11-13T12:00:00Z",
-  },
-  {
-    name: "job-7",
-    namespace: "production",
-    completions: 2,
-    active: 0,
-    failed: 1,
-    labels: { "job-type": "data-processing", scale: "large" },
-    creation_time: "2024-11-12T18:45:00Z",
-  },
-  {
-    name: "job-8",
-    namespace: "analytics",
-    completions: 0,
-    active: 3,
-    failed: 0,
-    labels: { task: "aggregation", priority: "low" },
-    creation_time: "2024-11-11T15:30:00Z",
-  },
-  {
-    name: "job-9",
-    namespace: "default",
-    completions: 4,
-    active: 0,
-    failed: 2,
-    labels: { component: "database", critical: "true" },
-    creation_time: "2024-11-10T10:15:00Z",
-  },
-  {
-    name: "job-10",
-    namespace: "qa",
-    completions: 2,
-    active: 0,
-    failed: 1,
-    labels: { stage: "testing", team: "qa" },
-    creation_time: "2024-11-09T08:45:00Z",
-  },
-  {
-    name: "job-11",
-    namespace: "default",
-    completions: 1,
-    active: 1,
-    failed: 0,
-    labels: { project: "frontend", framework: "react" },
-    creation_time: "2024-11-08T13:15:00Z",
-  },
-  {
-    name: "job-12",
-    namespace: "staging",
-    completions: 3,
-    active: 0,
-    failed: 0,
-    labels: { version: "beta", release: "candidate" },
-    creation_time: "2024-11-07T16:30:00Z",
-  },
-  {
-    name: "job-13",
-    namespace: "production",
-    completions: 0,
-    active: 2,
-    failed: 0,
-    labels: { task: "compression", cost: "medium" },
-    creation_time: "2024-11-06T14:00:00Z",
-  },
-  {
-    name: "job-14",
-    namespace: "testing",
-    completions: 5,
-    active: 0,
-    failed: 0,
-    labels: { "ci-tool": "jenkins", platform: "linux" },
-    creation_time: "2024-11-05T09:45:00Z",
-  },
-  {
-    name: "job-15",
-    namespace: "development",
-    completions: 1,
-    active: 0,
-    failed: 3,
-    labels: { deployment: "blue-green", environment: "dev" },
-    creation_time: "2024-11-04T18:15:00Z",
-  },
-  {
-    name: "job-16",
-    namespace: "monitoring",
-    completions: 4,
-    active: 0,
-    failed: 0,
-    labels: { service: "grafana", team: "ops" },
-    creation_time: "2024-11-03T11:30:00Z",
-  },
-  {
-    name: "job-17",
-    namespace: "default",
-    completions: 2,
-    active: 1,
-    failed: 0,
-    labels: { priority: "medium", node: "worker-1" },
-    creation_time: "2024-11-02T10:00:00Z",
-  },
-  {
-    name: "job-18",
-    namespace: "kube-system",
-    completions: 3,
-    active: 0,
-    failed: 1,
-    labels: { role: "scheduler", cluster: "prod-cluster" },
-    creation_time: "2024-11-01T14:45:00Z",
-  },
-  {
-    name: "job-19",
-    namespace: "development",
-    completions: 0,
-    active: 2,
-    failed: 1,
-    labels: { type: "worker", availability: "high" },
-    creation_time: "2024-10-31T12:30:00Z",
-  },
-  {
-    name: "job-20",
-    namespace: "default",
-    completions: 6,
-    active: 0,
-    failed: 0,
-    labels: { deployment: "canary", strategy: "rollout" },
-    creation_time: "2024-10-30T10:00:00Z",
-  },
-];
-
-const cronJobData = [
-  {
-    name: "cronjob-1",
-    namespace: "default",
-    schedule: "*/5 * * * *",
-    labels: { task: "sync", environment: "production" },
-    creation_time: "2024-11-18T10:00:00Z",
-  },
-  {
-    name: "cronjob-2",
-    namespace: "monitoring",
-    schedule: "0 0 * * 0",
-    labels: { app: "monitoring", team: "ops" },
-    creation_time: "2024-11-17T14:30:00Z",
-  },
-];
-
-const statusColors = {
-  Stop: "badge-stop",
-  Running: "badge-running",
-  Pending: "badge-pending",
-};
+import { Square15, Square4 } from "../Node/Squares";
+import { fetchData, confirm } from "../Utils";
 
 export const Job = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentData, setCurrentData] = useState(jobData);
+  const [currentData, setCurrentData] = useState([]);
   const [dataType, setDataType] = useState("Job");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-
-  // 데이터 타입 변경 핸들러
-  const handleDataTypeChange = (type) => {
-    setDataType(type);
-    if (type === "Job") setCurrentData(jobData);
-    if (type === "CronJob") setCurrentData(cronJobData);
-    setSearchTerm(""); // 검색어 초기화
-  };
-
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
   const [checkboxes, setCheckboxes] = useState([
     { id: 1, label: "nginx", isChecked: false },
@@ -240,6 +26,111 @@ export const Job = () => {
     { id: 3, label: "etcd", isChecked: false },
     // Add more checkboxes as needed
   ]);
+  const {
+    data: jobs,
+    isLoading: loadingJobs,
+    error: errorJobs,
+    refetch: refetchJobs,
+  } = useQuery("jobs", () => fetchData("http://localhost:8080/v1/jobs"), {
+    enabled: dataType === "Job", // PersistentVolume일 때만 실행
+  });
+  confirm(loadingJobs, errorJobs);
+
+  const {
+    data: cronjobs,
+    isLoading: loadingCronjobs,
+    error: errorCronjobs,
+    refetch: refetchCronjobs,
+  } = useQuery(
+    "cronjobs",
+    () => fetchData("http://localhost:8080/v1/cronjobs"),
+    {
+      enabled: dataType === "CronJob", // PersistentVolume일 때만 실행
+    }
+  );
+  confirm(loadingCronjobs, errorCronjobs);
+
+  // Job
+  useEffect(() => {
+    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
+    if (dataType !== "Job") return;
+
+    // 데이터가 없거나 로딩 중이면 실행하지 않음
+    if (!jobs || jobs.length === 0) {
+      refetchJobs(); // 데이터를 다시 가져오기 위해 refetch 호출
+      return;
+    }
+
+    const fetchJobMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const jobsMetricsPromises = jobs.map(async (job) => {
+        const jobsMetricsUrl = `http://localhost:8080/v1/jobs/${job.namespace}/${job.name}`;
+        const jobsMetrics = await fetchData(jobsMetricsUrl);
+        return {
+          ...job,
+          creation_time: jobsMetrics.creation_time,
+          active: jobsMetrics.active,
+          failed: jobsMetrics.failed,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedJobs = await Promise.all(jobsMetricsPromises);
+      setCurrentData(updatedJobs); // Store the updated pod details with metrics
+    };
+
+    fetchJobMetrics();
+  }, [dataType, jobs, refetchJobs]);
+
+  // CronJob
+  useEffect(() => {
+    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
+    if (dataType !== "CronJob") return;
+
+    // 데이터가 없거나 로딩 중이면 실행하지 않음
+    if (!cronjobs || cronjobs.length === 0) {
+      refetchCronjobs(); // 데이터를 다시 가져오기 위해 refetch 호출
+      return;
+    }
+
+    const fetchCronMetrics = async () => {
+      // Fetch detailed metrics for each pod
+      const cronMetricsPromises = cronjobs.map(async (cron) => {
+        const cronMetricsUrl = `http://localhost:8080/v1/cronjobs/${cron.namespace}/${cron.name}`;
+        const cronMetrics = await fetchData(cronMetricsUrl);
+        return {
+          ...cron,
+          creation_time: cronMetrics.creation_time,
+        };
+      });
+
+      // Wait for all metrics to be fetched
+      const updatedCrons = await Promise.all(cronMetricsPromises);
+      setCurrentData(updatedCrons); // Store the updated pod details with metrics
+    };
+
+    fetchCronMetrics();
+  }, [dataType, cronjobs, refetchCronjobs]);
+
+  // 데이터 타입 변경 핸들러
+  const handleDataTypeChange = (type) => {
+    setDataType(type);
+    if (type === "Job") setCurrentData(jobs);
+    if (type === "CronJob") setCurrentData(cronjobs);
+    setSearchTerm(""); // 검색어 초기화
+  };
+
+  if (
+    (dataType === "Job" && loadingJobs) ||
+    (dataType === "CronJob" && loadingCronjobs)
+  )
+    return <p>Loading...</p>;
+
+  if (
+    (dataType === "Job" && errorJobs) ||
+    (dataType === "CronJob" && errorCronjobs)
+  )
+    return <p>Error loading data.</p>;
 
   const openPopup = () => {
     setIsPopupOpen(true);
@@ -307,16 +198,18 @@ export const Job = () => {
       .map((checkbox) => checkbox.label);
   };
 
-  const filteredData = currentData.filter((item) => {
-    const matchesSearchTerm = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const activeFilters = getActiveFilters();
-    const matchesFilters =
-      activeFilters.length === 0 ||
-      activeFilters.every((filter) => item.name.includes(filter));
-    return matchesSearchTerm && matchesFilters;
-  });
+  const filteredData = currentData
+    ? currentData.filter((item) => {
+        const matchesSearchTerm = item.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const activeFilters = getActiveFilters();
+        const matchesFilters =
+          activeFilters.length === 0 ||
+          activeFilters.every((filter) => item.name.includes(filter));
+        return matchesSearchTerm && matchesFilters;
+      })
+    : [];
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
@@ -410,8 +303,9 @@ export const Job = () => {
                         <>
                           <th>NAME</th>
                           <th>NAMESPACE</th>
-                          <th>Schedule</th>
+                          <th>SCHEDULE</th>
                           <th>LABELS</th>
+                          <th>CREATION TIME</th>
                         </>
                       )}
                     </tr>
@@ -429,7 +323,11 @@ export const Job = () => {
                               {row.completions}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {JSON.stringify(row.labels)}
+                              {row.labels
+                                ? Object.entries(row.labels)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join(", ")
+                                : "<none>"}
                             </td>
                           </>
                         )}
@@ -443,7 +341,14 @@ export const Job = () => {
                               {row.schedule}
                             </td>
                             <td className="table-cell-ellipsis">
-                              {JSON.stringify(row.labels)}
+                              {row.labels
+                                ? Object.entries(row.labels)
+                                    .map(([key, value]) => `${key}: ${value}`)
+                                    .join(", ")
+                                : "<none>"}
+                            </td>
+                            <td className="table-cell-ellipsis">
+                              {row.creation_time}
                             </td>
                           </>
                         )}
@@ -537,16 +442,14 @@ export const Job = () => {
                           ? Object.entries(selectedRow.labels)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                     </>
                   )}
 
                   {dataType === "CronJob" && selectedRow && (
                     <>
-                      <Square15 topLeftText="Name">
-                        {selectedRow.name}
-                      </Square15>
+                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
                       <Square15 topLeftText="Namespace">
                         {selectedRow.namespace}
                       </Square15>
@@ -561,7 +464,7 @@ export const Job = () => {
                           ? Object.entries(selectedRow.labels)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                     </>
                   )}
