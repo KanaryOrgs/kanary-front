@@ -3,7 +3,19 @@ import Sidebar from "../../Sidebar";
 import Navbar from "../../Navbar";
 import { useQuery } from "react-query";
 import "./Overview.css";
+import "../Resources/Resources.css";
 import { fetchData, countNodeStatus, countPodStatus, confirm } from "../Utils";
+
+const statusColors = {
+  "No Connection": "badge-stop",
+  "Not Ready": "badge-pending",
+  "Ready": "badge-running",
+  "Running": "badge-running",
+  "Pending": "badge-pending",
+  "Succeeded": "badge-succeeded",
+  "Error": "badge-stop"
+};
+
 
 // Swagger UI : /swagger/index.html
 export const Overview = () => {
@@ -158,9 +170,17 @@ export const Overview = () => {
 const StatusCard = ({ title, statuses }) => (
   <div className="status-card">
     <h4>{title}</h4>
-    {statuses.map((status, index) => (
-      <p key={index}>{status}</p>
-    ))}
+    {statuses.map((status, index) => {
+      // 상태 문자열 전체에서 키를 찾음
+      const key = Object.keys(statusColors).find(k => status.startsWith(k));
+      return (
+        <p key={index}>
+          <span className={`badge ${statusColors[key] || "badge-default"}`}>
+            {status}
+          </span>
+        </p>
+      );
+    })}
   </div>
 );
 
