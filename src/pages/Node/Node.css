@@ -99,6 +99,28 @@
   cursor: pointer;
   color: #ffffff;
 }
+.list {
+  list-style-type: none; /* Remove default bullet points */
+  margin: 0;
+  padding: 0;
+}
+
+.list li {
+  padding: 4px 0; /* Add some spacing between rows */
+  font-size: 17px; /* Adjust font size */
+}
+
+.labels-list {
+  list-style-type: none; /* Remove bullets */
+  margin: 0;
+  padding: 0;
+}
+
+.labels-list li {
+  margin-bottom: 8px; /* Add spacing between lines */
+  line-height: 1.6; /* Improve readability with line height */
+  font-size: 17px; /* Adjust font size if needed */
+}
 
 @media (max-width: 900px) {
   .popup {

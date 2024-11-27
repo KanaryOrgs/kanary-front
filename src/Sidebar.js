@@ -47,7 +47,9 @@ const Sidebar = () => {
         <CDBSidebarContent className="sidebar-content">
           <CDBSidebarMenu>
             <NavLink exact to="/" activeClassName="activeClicked">
-              <CDBSidebarMenuItem icon="tachometer-alt">Overview</CDBSidebarMenuItem>
+              <CDBSidebarMenuItem icon="tachometer-alt">
+                Overview
+              </CDBSidebarMenuItem>
             </NavLink>
             <NavLink exact to="/topology" activeClassName="activeClicked">
               <CDBSidebarMenuItem icon="share-alt">Topology</CDBSidebarMenuItem>
@@ -71,66 +73,96 @@ const Sidebar = () => {
               </CDBSidebarMenuItem>
               {isResourcesOpen && (
                 <div style={{ paddingLeft: "20px" }}>
-                  <NavLink exact to="/resources/pods" activeClassName="activeClicked">
+                  <NavLink
+                    exact
+                    to="/resources/pods"
+                    activeClassName="activeClicked"
+                  >
                     <CDBSidebarMenuItem icon="cube">Pods</CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/volume" activeClassName="activeClicked">
+                  <NavLink
+                    exact
+                    to="/resources/volume"
+                    activeClassName="activeClicked"
+                  >
                     <CDBSidebarMenuItem icon="hdd">Volume</CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/service" activeClassName="activeClicked">
-                    <CDBSidebarMenuItem icon="network-wired">Service</CDBSidebarMenuItem>
+                  <NavLink
+                    exact
+                    to="/resources/service"
+                    activeClassName="activeClicked"
+                  >
+                    <CDBSidebarMenuItem icon="network-wired">
+                      Service
+                    </CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/daemonset" activeClassName="activeClicked">
-                    <CDBSidebarMenuItem icon="tasks">Daemonset</CDBSidebarMenuItem>
+                  <NavLink
+                    exact
+                    to="/resources/daemonset"
+                    activeClassName="activeClicked"
+                  >
+                    <CDBSidebarMenuItem icon="tasks">
+                      Daemonset
+                    </CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/job" activeClassName="activeClicked">
+                  <NavLink
+                    exact
+                    to="/resources/job"
+                    activeClassName="activeClicked"
+                  >
                     <CDBSidebarMenuItem icon="cogs">Job</CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/statefulset" activeClassName="activeClicked">
-                    <CDBSidebarMenuItem icon="clone">StatefulSet</CDBSidebarMenuItem>
+                  <NavLink
+                    exact
+                    to="/resources/statefulset"
+                    activeClassName="activeClicked"
+                  >
+                    <CDBSidebarMenuItem icon="clone">
+                      Statefulset
+                    </CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/ingress" activeClassName="activeClicked">
-                    <CDBSidebarMenuItem icon="route">Ingress</CDBSidebarMenuItem>
+                  <NavLink
+                    exact
+                    to="/resources/ingress"
+                    activeClassName="activeClicked"
+                  >
+                    <CDBSidebarMenuItem icon="route">
+                      Ingress
+                    </CDBSidebarMenuItem>
                   </NavLink>
-                  <NavLink exact to="/resources/deployment" activeClassName="activeClicked">
-                    <CDBSidebarMenuItem icon="cloud-upload-alt">Deployment</CDBSidebarMenuItem>
+                  <NavLink
+                    exact
+                    to="/resources/deployment"
+                    activeClassName="activeClicked"
+                  >
+                    <CDBSidebarMenuItem icon="cloud-upload-alt">
+                      Deployment
+                    </CDBSidebarMenuItem>
                   </NavLink>
                 </div>
               )}
             </div>
 
             <NavLink exact to="/event" activeClassName="activeClicked">
-              <CDBSidebarMenuItem icon="exclamation-circle">Event</CDBSidebarMenuItem>
+              <CDBSidebarMenuItem icon="exclamation-circle">
+                Event
+              </CDBSidebarMenuItem>
             </NavLink>
           </CDBSidebarMenu>
         </CDBSidebarContent>
 
         <CDBSidebarFooter className="sidebar-footer">
           <CDBSidebarContent>
-            <NavLink
-              exact
-              to="/settings"
-              activeClassName="activeClicked"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <CDBSidebarMenuItem icon="cog">Settings</CDBSidebarMenuItem>
-            </NavLink>
             <a
               href="https://github.com/orgs/KanaryOrgs/repositories"
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <CDBSidebarMenuItem icon="question-circle">Help</CDBSidebarMenuItem>
+              <CDBSidebarMenuItem icon="question-circle">
+                Help
+              </CDBSidebarMenuItem>
             </a>
-            <NavLink
-              exact
-              to="/logout"
-              activeClassName="activeClicked"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <CDBSidebarMenuItem icon="sign-out-alt">Log Out</CDBSidebarMenuItem>
-            </NavLink>
           </CDBSidebarContent>
         </CDBSidebarFooter>
       </CDBSidebar>

@@ -4,8 +4,6 @@ import Navbar from "../../Navbar";
 import { CDBTable, CDBTableHeader, CDBTableBody } from "cdbreact";
 import "../Node/Node.css";
 import "./Resources.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { fetchData, confirm } from "../Utils";
 import { useQuery } from "react-query";
 
@@ -21,53 +19,6 @@ export const Service = () => {
   const pageSize = 8; // 최대 행 개수
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
-
-  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
-  const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "nginx", isChecked: false },
-    { id: 2, label: "kube", isChecked: false },
-    { id: 3, label: "etcd", isChecked: false },
-    // Add more checkboxes as needed
-  ]);
-
-  const openPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-  };
-
-  const handleSelectAllChange = () => {
-    const newSelectAllChecked = !isSelectAllChecked;
-    setIsSelectAllChecked(newSelectAllChecked);
-    setCheckboxes(
-      checkboxes.map((checkbox) => ({
-        ...checkbox,
-        isChecked: newSelectAllChecked,
-      }))
-    );
-  };
-
-  const handleCheckboxChange = (id) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.id === id
-        ? { ...checkbox, isChecked: !checkbox.isChecked }
-        : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-
-    const allChecked = updatedCheckboxes.every(
-      (checkbox) => checkbox.isChecked
-    );
-    const noneChecked = updatedCheckboxes.every(
-      (checkbox) => !checkbox.isChecked
-    );
-    if (allChecked || noneChecked) {
-      setIsSelectAllChecked(allChecked);
-    }
-  };
 
   // 검색을 했다면 자동으로 1페이지로 바뀌게
   const handleSearch = (searchTerm) => {
@@ -75,31 +26,11 @@ export const Service = () => {
     setCurrentPage(1); // 검색을 했다면 자동으로 1페이지로 바뀌게 설정
   };
 
-  const handleRemoveFilter = (label) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.label === label ? { ...checkbox, isChecked: false } : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-    setIsSelectAllChecked(false);
-  };
-
-  const getActiveFilters = () => {
-    return checkboxes
-      .filter((checkbox) => checkbox.isChecked)
-      .map((checkbox) => checkbox.label);
-  };
-
+  // 검색 필터링
   const filteredData = services
-    ? services.filter((item) => {
-        const matchesSearchTerm = item.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const activeFilters = getActiveFilters();
-        const matchesFilters =
-          activeFilters.length === 0 ||
-          activeFilters.every((filter) => item.name.includes(filter));
-        return matchesSearchTerm && matchesFilters;
-      })
+    ? services.filter((svc) =>
+        svc.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   // 필터링 된 데이터에서 현재 페이지 인덱스 범위 계산
@@ -133,22 +64,6 @@ export const Service = () => {
             <div className="grid-wrapper">
               <div className="mt-5">
                 <div className="search-filter-wrapper">
-                  <div className="filter-container">
-                    {getActiveFilters().map(
-                      (
-                        filter // 필터 상자
-                      ) => (
-                        <div key={filter} className="filter-box">
-                          <span>{filter}</span>
-                          <FontAwesomeIcon
-                            icon={faTimes}
-                            className="close-icon"
-                            onClick={() => handleRemoveFilter(filter)}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
                   <input // 검색창
                     type="text"
                     placeholder="Search"
@@ -156,13 +71,6 @@ export const Service = () => {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="search-input-resources"
                   />
-
-                  <button // 필터 버튼
-                    onClick={openPopup}
-                    className="button"
-                  >
-                    Filter
-                  </button>
                 </div>
                 <CDBTable responsive>
                   <CDBTableHeader>
@@ -245,40 +153,6 @@ export const Service = () => {
                 </div>
               </div>
             </div>
-            {isPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closePopup}
-                  />{" "}
-                  Select Filters
-                </h2>
-                <div className="filter-popup">
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={isSelectAllChecked}
-                      onChange={handleSelectAllChange}
-                    />
-                    <label>Select All</label>
-                  </div>
-                  <div className="checkbox-container">
-                    {checkboxes.map((checkbox) => (
-                      <div key={checkbox.id}>
-                        <input
-                          type="checkbox"
-                          checked={checkbox.isChecked}
-                          onChange={() => handleCheckboxChange(checkbox.id)}
-                        />
-                        <label>{checkbox.label}</label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

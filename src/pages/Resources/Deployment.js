@@ -16,15 +16,7 @@ export const Deployment = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false);
-  const [deployDetails, setDeployDetails] = useState([]);
-  const [filterPopupOpen, setFilterPopupOpen] = useState(false);
-  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
-  const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "default", isChecked: false },
-    { id: 2, label: "kube-system", isChecked: false },
-    { id: 3, label: "production", isChecked: false },
-    { id: 4, label: "staging", isChecked: false },
-  ]);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const {
     data: deploys,
@@ -35,75 +27,31 @@ export const Deployment = () => {
   );
   confirm(loadingDeploys, errorDeploys);
 
-  useEffect(() => {
-    if (!deploys || deploys.length === 0) return;
+  // 상태 업데이트: 로딩 중에도 이전 데이터를 유지
+  const openDetailPopup = async (row) => {
+    setIsDetailPopupOpen(true); // 팝업 열기
+    setLoadingDetail(true); // 로딩 시작
 
-    const fetchdeployMetrics = async () => {
-      // Fetch detailed metrics for each deploy
-      const deployMetricsPromises = deploys.map(async (deploy) => {
-        const deployMetricsUrl = `http://localhost:8080/v1/deployments/${deploy.namespace}/${deploy.name}`;
-        const deployMetrics = await fetchData(deployMetricsUrl);
-        return {
-          ...deploy,
-          updated: deployMetrics.updated, // Add default values if needed
-          ready: deployMetrics.ready,
-          creation_time: deployMetrics.creation_time,
-        };
-      });
+    try {
+      const detailUrl = `http://localhost:8080/v1/deployments/${row.namespace}/${row.name}`;
+      const detailData = await fetchData(detailUrl);
 
-      // Wait for all metrics to be fetched
-      const updatedDeploys = await Promise.all(deployMetricsPromises);
-      setDeployDetails(updatedDeploys); // Store the updated deploy details with metrics
-    };
-
-    fetchdeployMetrics();
-  }, [deploys]);
-
-  const openDetailPopup = (row) => {
-    setSelectedRow(row);
-    setIsDetailPopupOpen(true);
+      // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+      setSelectedRow((prev) => ({
+        ...prev,
+        ...row,
+        ...detailData,
+      }));
+    } catch (error) {
+      console.error("Error fetching pod details:", error);
+    } finally {
+      setLoadingDetail(false); // 로딩 종료
+    }
   };
 
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
-  };
-
-  const openPopup = () => {
-    setFilterPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setFilterPopupOpen(false);
-  };
-
-  const handleSelectAllChange = () => {
-    const newSelectAllChecked = !isSelectAllChecked;
-    setIsSelectAllChecked(newSelectAllChecked);
-    setCheckboxes(
-      checkboxes.map((checkbox) => ({
-        ...checkbox,
-        isChecked: newSelectAllChecked,
-      }))
-    );
-  };
-
-  const handleCheckboxChange = (id) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.id === id
-        ? { ...checkbox, isChecked: !checkbox.isChecked }
-        : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-
-    const allChecked = updatedCheckboxes.every(
-      (checkbox) => checkbox.isChecked
-    );
-    const noneChecked = updatedCheckboxes.every(
-      (checkbox) => !checkbox.isChecked
-    );
-    if (allChecked || noneChecked) {
-      setIsSelectAllChecked(allChecked);
-    }
+    setSelectedRow(null);
   };
 
   const handleSearch = (searchTerm) => {
@@ -111,30 +59,11 @@ export const Deployment = () => {
     setCurrentPage(1);
   };
 
-  const handleRemoveFilter = (label) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.label === label ? { ...checkbox, isChecked: false } : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-    setIsSelectAllChecked(false);
-  };
-
-  const getActiveFilters = () => {
-    return checkboxes
-      .filter((checkbox) => checkbox.isChecked)
-      .map((checkbox) => checkbox.label);
-  };
-
-  const filteredData = deployDetails
-    ? deployDetails.filter((item) => {
-        const matchesSearchTerm = item.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const activeFilters = getActiveFilters();
-        const matchesFilters =
-          activeFilters.length === 0 || activeFilters.includes(item.namespace);
-        return matchesSearchTerm && matchesFilters;
-      })
+  // 검색 필터링
+  const filteredData = deploys
+    ? deploys.filter((deploy) =>
+        deploy.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -164,22 +93,6 @@ export const Deployment = () => {
             <div className="grid-wrapper">
               <div className="mt-5">
                 <div className="search-filter-wrapper">
-                  <div className="filter-container">
-                    {getActiveFilters().map(
-                      (
-                        filter //필터 상자
-                      ) => (
-                        <div key={filter} className="filter-box">
-                          <span>{filter}</span>
-                          <FontAwesomeIcon
-                            icon={faTimes}
-                            className="close-icon"
-                            onClick={() => handleRemoveFilter(filter)}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
                   <input // 검색창
                     type="text"
                     placeholder="Search"
@@ -187,9 +100,6 @@ export const Deployment = () => {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="search-input-resources"
                   />
-                  <button onClick={openPopup} className="button">
-                    Filter
-                  </button>
                 </div>
                 <CDBTable responsive>
                   <CDBTableHeader>
@@ -239,77 +149,64 @@ export const Deployment = () => {
               </div>
             </div>
 
-            {filterPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closePopup}
-                  />
-                  Select Filters
-                </h2>
-                <div>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={isSelectAllChecked}
-                      onChange={handleSelectAllChange}
-                    />
-                    Select All
-                  </label>
-                  {checkboxes.map((checkbox) => (
-                    <label key={checkbox.id}>
-                      <input
-                        type="checkbox"
-                        checked={checkbox.isChecked}
-                        onChange={() => handleCheckboxChange(checkbox.id)}
-                      />
-                      {checkbox.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {isDetailPopupOpen && (
-              <div className="popup">
+              <div className={`popup ${isDetailPopupOpen ? "open" : ""}`}>
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
                     className="close-button"
                     onClick={closeDetailPopup}
                   />
-                  {selectedRow.name}
+                  {selectedRow?.name || "Loading..."}
                 </h2>
-                <div className="popup-content">
-                  <Square15 topLeftText="Name Space">
-                    {selectedRow.namespace}
-                  </Square15>
-                  <Square15 topLeftText="Replicas">
-                    {selectedRow.replicas}
-                  </Square15>
-                  <Square15 topLeftText="Available">
-                    {selectedRow.available}
-                  </Square15>
-                  <Square15 topLeftText="Updated">
-                    {selectedRow.updated}
-                  </Square15>
-                  <Square15 topLeftText="Ready">{selectedRow.ready}</Square15>
-                  <Square4 topLeftText="Labels">
-                    {selectedRow.labels
-                      ? Object.entries(selectedRow.labels)
-                          .map(([key, value]) => `${key}: ${value}`)
-                          .join(", ")
-                      : "<none>"}
-                  </Square4>
-                  <Square4 topLeftText="Creation Time">
-                    {" "}
-                    {/* 한글로 시간 출력되게 하려면 아래와 같이 하고 Square4 쓸 것 */}
-                    {selectedRow.creation_time
-                      ? new Date(selectedRow.creation_time).toLocaleString()
-                      : ""}
-                  </Square4>
+                <div
+                  className={`popup-content ${loadingDetail ? "loading" : ""}`}
+                >
+                  {loadingDetail ? (
+                    <p>Loading details...</p>
+                  ) : selectedRow ? (
+                    <>
+                      <Square15 topLeftText="Name Space">
+                        {selectedRow.namespace}
+                      </Square15>
+                      <Square15 topLeftText="Replicas">
+                        {selectedRow.replicas}
+                      </Square15>
+                      <Square15 topLeftText="Available">
+                        {selectedRow.available}
+                      </Square15>
+                      <Square15 topLeftText="Updated">
+                        {selectedRow.updated}
+                      </Square15>
+                      <Square15 topLeftText="Ready">
+                        {selectedRow.ready}
+                      </Square15>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "<none>"
+                        )}
+                      </Square4>
+                      <Square4 topLeftText="Creation Time">
+                        <td>
+                          {selectedRow.creation_time
+                            ? new Date(selectedRow.creation_time).toUTCString()
+                            : ""}
+                        </td>
+                      </Square4>
+                    </>
+                  ) : (
+                    <p>No data available.</p>
+                  )}
                 </div>
               </div>
             )}

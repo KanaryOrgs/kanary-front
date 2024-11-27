@@ -56,7 +56,7 @@ export const styles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    color: props.centerColor || "#45828E",
+    color: props.centerColor || "#BDD6DB",
     fontSize: props.centerFontSize || "18px",
     fontWeight: props.topLeftFontWeight || "bold",
   }),
@@ -69,7 +69,7 @@ export const styles = {
     wordWrap: "break-word", // 자동 줄바꿈
     whiteSpace: "normal", // 여러 줄 텍스트 허용
     maxWidth: "calc(100% - 20px)",
-    color: props.centerColor || "#45828E",
+    color: props.centerColor || "#BDD6DB",
     fontSize: props.centerFontSize || "18px",
     fontWeight: props.topLeftFontWeight || "bold",
   }),
@@ -109,14 +109,19 @@ export const styles = {
   // Square4 스타일
   square4Container: {
     width: "675px",
-    minHeight: "150px", // 최소 높이 설정 (필요에 따라 조정)
+    minHeight: "150px", // 최소 높이
+    maxWidth: "100%", // 최대 너비 제한
     backgroundColor: "#3D4657",
     display: "inline-block",
     position: "relative",
     borderRadius: "4px",
     margin: "15px 15px 0 0",
-    padding: "10px", // 내용과 여백을 위한 패딩 추가
-    boxSizing: "border-box", // 패딩이 높이에 포함되도록 설정
+    padding: "10px", // 내부 여백
+    boxSizing: "border-box", // 패딩 포함
+    overflow: "auto", // 내용이 넘치지 않게 설정
+    whiteSpace: "pre-wrap", // 줄바꿈 유지
+    wordWrap: "break-word", // 단어를 강제로 줄바꿈
+    lineHeight: "1.5", // 읽기 편한 줄 간격
   },
 };
 

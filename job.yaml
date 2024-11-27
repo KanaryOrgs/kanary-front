@@ -1,0 +1,74 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-job
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - name: example-container
+          image: busybox
+          command: ["echo", "Hello, Kubernetes!"]
+      restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-job2
+  namespace: default
+  labels:
+    batch.kubernetes.io/job-name: example-job2
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        job-name: example-job2
+    spec:
+      containers:
+        - name: example-container
+          image: nginx:1.21
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: example-cronjob
+  namespace: default
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: example-container
+              image: busybox
+              command: ["echo", "Hello, CronJob!"]
+          restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: example-cronjob
+  namespace: default
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: example-container
+              image: nginx:1.21
+              resources:
+                limits:
+                  cpu: "100m"
+                  memory: "128Mi"
+          restartPolicy: OnFailure

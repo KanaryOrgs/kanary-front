@@ -7,9 +7,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { fetchData, confirm } from "../Utils";
 import { useQuery } from "react-query";
-import { Square1, Square2 } from "./Squares";
+import { Square1, Square15, Square2, Square4 } from "./Squares";
 
 export const Node = () => {
+  const pageSize = 8; // 최대 행 개수
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
   const {
     data: nodes,
     isLoading: loadingNodes,
@@ -17,20 +24,59 @@ export const Node = () => {
   } = useQuery("nodes", () => fetchData("http://localhost:8080/v1/nodes"));
   confirm(loadingNodes, errorNodes);
 
-  const pageSize = 8; // 최대 행 개수
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  if (loadingNodes) return <p>Loading nodes...</p>;
+  if (errorNodes) return <p>Error loading nodes.</p>;
 
-  const openPopup = (row) => {
-    setSelectedRow(row);
-    setIsPopupOpen(true);
+  // 상태 업데이트: 로딩 중에도 이전 데이터를 유지
+  const openDetailPopup = async (row) => {
+    setIsDetailPopupOpen(true); // 팝업 열기
+    setLoadingDetail(true); // 로딩 시작
+
+    try {
+      const detailUrl = `http://localhost:8080/v1/nodes/${row.name}`;
+      const detailData = await fetchData(detailUrl);
+
+      // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+      setSelectedRow((prev) => {
+        // 데이터 가공
+        const totalMemoryGB =
+          parseInt(detailData.capacity.memory, 10) / 1024 / 1024; // KiB to GB
+
+        const totalStorageGB =
+          parseInt(detailData.capacity["ephemeral-storage"], 10) / 1024 / 1024; // KiB to GB
+
+        // 조건 상태 처리
+        const readyStatus = detailData.conditions.some((condition) =>
+          condition.includes("Ready=True")
+        )
+          ? "Ready"
+          : "Not Ready";
+
+        // 새로운 데이터를 가공하여 업데이트
+        return {
+          ...prev,
+          ...row,
+          ...detailData,
+          totalMemoryGB: totalMemoryGB.toFixed(2),
+          totalStorageGB: totalStorageGB.toFixed(2),
+          totalSwap: detailData.capacity.swap
+            ? (parseInt(detailData.capacity.swap, 10) / 1024 / 1024).toFixed(
+                2
+              ) + " GB"
+            : "0 GB",
+          readyStatus,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching pod details:", error);
+    } finally {
+      setLoadingDetail(false); // 로딩 종료
+    }
   };
 
-  const closePopup = () => {
+  const closeDetailPopup = () => {
+    setIsDetailPopupOpen(false);
     setSelectedRow(null);
-    setIsPopupOpen(false);
   };
 
   // 검색을 했다면 자동으로 1페이지로 바뀌게
@@ -98,7 +144,7 @@ export const Node = () => {
               </CDBTableHeader>
               <CDBTableBody>
                 {currentPageData.map((row, index) => (
-                  <tr key={index} onClick={() => openPopup(row)}>
+                  <tr key={index} onClick={() => openDetailPopup(row)}>
                     <td>{row.name}</td>
                     <td>{row.ip}</td>
                     <td>{row.cpu_core}</td>
@@ -128,47 +174,76 @@ export const Node = () => {
               )}
             </div>
 
-            {isPopupOpen && (
-              <div className="popup">
+            {isDetailPopupOpen && (
+              <div className={`popup ${isDetailPopupOpen ? "open" : ""}`}>
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
                     className="close-button"
-                    onClick={closePopup}
+                    onClick={closeDetailPopup}
                   />
-                  {selectedRow.name}
+                  {selectedRow?.name || "Loading..."}
                 </h2>
-                <div className="popup-content">
-                  <Square1 topLeftText="CPU Busy" progress={3.45}>
-                    {3.45}%
-                  </Square1>
-                  <Square1 topLeftText="Sys Load(5m)" progress={3.0}>
-                    {3.0}%
-                  </Square1>
-                  <Square1 topLeftText="Sys Load(15m)" progress={3.45}>
-                    {3.45}%
-                  </Square1>
-                  <Square1 topLeftText="Ram Used" progress={3.0}>
-                    {3.0}%
-                  </Square1>
-                  <Square1 topLeftText="Swap Used" progress={3.45}>
-                    {3.45}%
-                  </Square1>
-                  <Square1 topLeftText="Root FS Used" progress={3.0}>
-                    {3.0}%
-                  </Square1>
-                  <Square2 topLeftText="CPU Core">
-                    {selectedRow.cpu_core}
-                  </Square2>
-                  <Square2 topLeftText="Uptime">
-                    {15}d {4}h
-                  </Square2>
-                  <Square2 topLeftText="Last Data">{2} sec ago</Square2>
-                  <Square2 topLeftText="Total Root FS">{14}GB</Square2>
-                  <Square2 topLeftText="Ram Total">
-                    {selectedRow.ram_capacity}GB
-                  </Square2>
-                  <Square2 topLeftText="Total Swap">{0}B</Square2>
+                <div
+                  className={`popup-content ${loadingDetail ? "loading" : ""}`}
+                >
+                  {loadingDetail ? (
+                    <p>Loading details...</p>
+                  ) : selectedRow ? (
+                    <>
+                      <Square15 topLeftText="CPU Core">
+                        {selectedRow.cpu_core}
+                      </Square15>
+                      <Square15 topLeftText="Total Memory">
+                        {selectedRow.totalMemoryGB} GB
+                      </Square15>
+                      <Square15 topLeftText="Total Root FS">
+                        {selectedRow.totalStorageGB} GB
+                      </Square15>
+                      <Square15 topLeftText="Node Status">
+                        {selectedRow.readyStatus}
+                      </Square15>
+                      <Square15 topLeftText="Pods Capacity">
+                        {selectedRow.capacity.pods}
+                      </Square15>
+                      <Square15 topLeftText="Total Swap">
+                        {selectedRow.totalSwap}
+                      </Square15>
+                      <Square4 topLeftText="Conditions">
+                        {Array.isArray(selectedRow.conditions) ? (
+                          <ul className="list">
+                            {selectedRow.conditions.map((condition, index) => {
+                              const [key, value] = condition.split("=");
+                              return (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
+                      </Square4>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
+                      </Square4>
+                    </>
+                  ) : (
+                    <p>No data available.</p>
+                  )}
                 </div>
               </div>
             )}

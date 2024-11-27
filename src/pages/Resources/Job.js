@@ -13,26 +13,19 @@ import { fetchData, confirm } from "../Utils";
 export const Job = () => {
   const pageSize = 8;
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentData, setCurrentData] = useState([]);
   const [dataType, setDataType] = useState("Job");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
-  const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "nginx", isChecked: false },
-    { id: 2, label: "kube", isChecked: false },
-    { id: 3, label: "etcd", isChecked: false },
-    // Add more checkboxes as needed
-  ]);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [data, setData] = useState([]);
+
   const {
     data: jobs,
     isLoading: loadingJobs,
     error: errorJobs,
-    refetch: refetchJobs,
   } = useQuery("jobs", () => fetchData("http://localhost:8080/v1/jobs"), {
-    enabled: dataType === "Job", // PersistentVolume일 때만 실행
+    enabled: dataType === "Job",
   });
   confirm(loadingJobs, errorJobs);
 
@@ -40,84 +33,75 @@ export const Job = () => {
     data: cronjobs,
     isLoading: loadingCronjobs,
     error: errorCronjobs,
-    refetch: refetchCronjobs,
   } = useQuery(
     "cronjobs",
     () => fetchData("http://localhost:8080/v1/cronjobs"),
     {
-      enabled: dataType === "CronJob", // PersistentVolume일 때만 실행
+      enabled: dataType === "CronJob",
     }
   );
   confirm(loadingCronjobs, errorCronjobs);
 
-  // Job
-  useEffect(() => {
-    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
-    if (dataType !== "Job") return;
+  // 상태 업데이트: 로딩 중에도 이전 데이터를 유지
+  const openDetailPopup = async (row) => {
+    setIsDetailPopupOpen(true); // 팝업 열기
+    setLoadingDetail(true); // 로딩 시작
+    if (dataType == "Job") {
+      try {
+        const detailUrl = `http://localhost:8080/v1/jobs/${row.namespace}/${row.name}`;
+        const detailData = await fetchData(detailUrl);
 
-    // 데이터가 없거나 로딩 중이면 실행하지 않음
-    if (!jobs || jobs.length === 0) {
-      refetchJobs(); // 데이터를 다시 가져오기 위해 refetch 호출
-      return;
+        // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+        setSelectedRow((prev) => ({
+          ...prev,
+          ...row,
+          ...detailData,
+        }));
+      } catch (error) {
+        console.error("Error fetching jobs details:", error);
+      } finally {
+        setLoadingDetail(false); // 로딩 종료
+      }
     }
+    if (dataType == "CronJob") {
+      try {
+        const detailUrl = `http://localhost:8080/v1/cronjobs/${row.namespace}/${row.name}`;
+        const detailData = await fetchData(detailUrl);
 
-    const fetchJobMetrics = async () => {
-      // Fetch detailed metrics for each pod
-      const jobsMetricsPromises = jobs.map(async (job) => {
-        const jobsMetricsUrl = `http://localhost:8080/v1/jobs/${job.namespace}/${job.name}`;
-        const jobsMetrics = await fetchData(jobsMetricsUrl);
-        return {
-          ...job,
-          creation_time: jobsMetrics.creation_time,
-          active: jobsMetrics.active,
-          failed: jobsMetrics.failed,
-        };
-      });
-
-      // Wait for all metrics to be fetched
-      const updatedJobs = await Promise.all(jobsMetricsPromises);
-      setCurrentData(updatedJobs); // Store the updated pod details with metrics
-    };
-
-    fetchJobMetrics();
-  }, [dataType, jobs, refetchJobs]);
-
-  // CronJob
-  useEffect(() => {
-    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
-    if (dataType !== "CronJob") return;
-
-    // 데이터가 없거나 로딩 중이면 실행하지 않음
-    if (!cronjobs || cronjobs.length === 0) {
-      refetchCronjobs(); // 데이터를 다시 가져오기 위해 refetch 호출
-      return;
+        // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+        setSelectedRow((prev) => ({
+          ...prev,
+          ...row,
+          ...detailData,
+        }));
+      } catch (error) {
+        console.error("Error fetching cronjobs details:", error);
+      } finally {
+        setLoadingDetail(false); // 로딩 종료
+      }
     }
+  };
 
-    const fetchCronMetrics = async () => {
-      // Fetch detailed metrics for each pod
-      const cronMetricsPromises = cronjobs.map(async (cron) => {
-        const cronMetricsUrl = `http://localhost:8080/v1/cronjobs/${cron.namespace}/${cron.name}`;
-        const cronMetrics = await fetchData(cronMetricsUrl);
-        return {
-          ...cron,
-          creation_time: cronMetrics.creation_time,
-        };
-      });
+  useEffect(() => {
+    // 초기 데이터 설정
+    if (dataType === "Job" && jobs) {
+      setData(jobs);
+    } else if (dataType === "CronJob" && cronjobs) {
+      setData(cronjobs);
+    }
+  }, [dataType, jobs, cronjobs]);
 
-      // Wait for all metrics to be fetched
-      const updatedCrons = await Promise.all(cronMetricsPromises);
-      setCurrentData(updatedCrons); // Store the updated pod details with metrics
-    };
-
-    fetchCronMetrics();
-  }, [dataType, cronjobs, refetchCronjobs]);
-
-  // 데이터 타입 변경 핸들러
   const handleDataTypeChange = (type) => {
-    setDataType(type);
-    if (type === "Job") setCurrentData(jobs);
-    if (type === "CronJob") setCurrentData(cronjobs);
+    setDataType(type); // 데이터 타입 변경
     setSearchTerm(""); // 검색어 초기화
+    setCurrentPage(1); // 페이지 초기화
+
+    // 데이터 동기화
+    if (type === "Job" && jobs) {
+      setData(jobs);
+    } else if (type === "CronJob" && cronjobs) {
+      setData(cronjobs);
+    }
   };
 
   if (
@@ -132,51 +116,8 @@ export const Job = () => {
   )
     return <p>Error loading data.</p>;
 
-  const openPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-  };
-
-  const openDetailPopup = (row) => {
-    setSelectedRow(row);
-    setIsDetailPopupOpen(true);
-  };
-
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
-  };
-
-  const handleSelectAllChange = () => {
-    const newSelectAllChecked = !isSelectAllChecked;
-    setIsSelectAllChecked(newSelectAllChecked);
-    setCheckboxes(
-      checkboxes.map((checkbox) => ({
-        ...checkbox,
-        isChecked: newSelectAllChecked,
-      }))
-    );
-  };
-
-  const handleCheckboxChange = (id) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.id === id
-        ? { ...checkbox, isChecked: !checkbox.isChecked }
-        : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-
-    const allChecked = updatedCheckboxes.every(
-      (checkbox) => checkbox.isChecked
-    );
-    const noneChecked = updatedCheckboxes.every(
-      (checkbox) => !checkbox.isChecked
-    );
-    if (allChecked || noneChecked) {
-      setIsSelectAllChecked(allChecked);
-    }
   };
 
   const handleSearch = (searchTerm) => {
@@ -184,31 +125,11 @@ export const Job = () => {
     setCurrentPage(1);
   };
 
-  const handleRemoveFilter = (label) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.label === label ? { ...checkbox, isChecked: false } : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-    setIsSelectAllChecked(false);
-  };
-
-  const getActiveFilters = () => {
-    return checkboxes
-      .filter((checkbox) => checkbox.isChecked)
-      .map((checkbox) => checkbox.label);
-  };
-
-  const filteredData = currentData
-    ? currentData.filter((item) => {
-        const matchesSearchTerm = item.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const activeFilters = getActiveFilters();
-        const matchesFilters =
-          activeFilters.length === 0 ||
-          activeFilters.every((filter) => item.name.includes(filter));
-        return matchesSearchTerm && matchesFilters;
-      })
+  // 검색 필터링
+  const filteredData = data
+    ? data.filter((d) =>
+        d.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -257,22 +178,6 @@ export const Job = () => {
                   </button>
                 </div>
                 <div className="search-filter-wrapper">
-                  <div className="filter-container">
-                    {getActiveFilters().map(
-                      (
-                        filter // 필터 상자
-                      ) => (
-                        <div key={filter} className="filter-box">
-                          <span>{filter}</span>
-                          <FontAwesomeIcon
-                            icon={faTimes}
-                            className="close-icon"
-                            onClick={() => handleRemoveFilter(filter)}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
                   <input // 검색창
                     type="text"
                     placeholder="Search"
@@ -280,13 +185,6 @@ export const Job = () => {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="search-input-resources"
                   />
-
-                  <button // 필터 버튼
-                    onClick={openPopup}
-                    className="button"
-                  >
-                    Filter
-                  </button>
                 </div>
                 <CDBTable responsive>
                   <CDBTableHeader>
@@ -305,7 +203,6 @@ export const Job = () => {
                           <th>NAMESPACE</th>
                           <th>SCHEDULE</th>
                           <th>LABELS</th>
-                          <th>CREATION TIME</th>
                         </>
                       )}
                     </tr>
@@ -347,9 +244,6 @@ export const Job = () => {
                                     .join(", ")
                                 : "<none>"}
                             </td>
-                            <td className="table-cell-ellipsis">
-                              {row.creation_time}
-                            </td>
                           </>
                         )}
                       </tr>
@@ -375,51 +269,20 @@ export const Job = () => {
                 </div>
               </div>
             </div>
-            {isPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closePopup}
-                  />{" "}
-                  Select Filters
-                </h2>
-                <div className="filter-popup">
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={isSelectAllChecked}
-                      onChange={handleSelectAllChange}
-                    />
-                    <label>Select All</label>
-                  </div>
-                  <div className="checkbox-container">
-                    {checkboxes.map((checkbox) => (
-                      <div key={checkbox.id}>
-                        <input
-                          type="checkbox"
-                          checked={checkbox.isChecked}
-                          onChange={() => handleCheckboxChange(checkbox.id)}
-                        />
-                        <label>{checkbox.label}</label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+
             {isDetailPopupOpen && (
-              <div className="popup">
+              <div className={`popup ${isDetailPopupOpen ? "open" : ""}`}>
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
                     className="close-button"
                     onClick={closeDetailPopup}
                   />
-                  {selectedRow.name}
+                  {selectedRow?.name || "Loading..."}
                 </h2>
-                <div className="popup-content">
+                <div
+                  className={`popup-content ${loadingDetail ? "loading" : ""}`}
+                >
                   {dataType === "Job" && selectedRow && (
                     <>
                       <Square15 topLeftText="Namespace">
@@ -434,15 +297,27 @@ export const Job = () => {
                       <Square15 topLeftText="Failed">
                         {selectedRow.failed}
                       </Square15>
-                      <Square15 topLeftText="Creation Time">
-                        {selectedRow.creation_time}
-                      </Square15>
+                      <Square4 topLeftText="Creation Time">
+                        <td>
+                          {selectedRow.creation_time
+                            ? new Date(selectedRow.creation_time).toUTCString()
+                            : ""}
+                        </td>
+                      </Square4>
                       <Square4 topLeftText="Labels">
-                        {selectedRow.labels
-                          ? Object.entries(selectedRow.labels)
-                              .map(([key, value]) => `${key}: ${value}`)
-                              .join(", ")
-                          : "<none>"}
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
                       </Square4>
                     </>
                   )}
@@ -456,24 +331,31 @@ export const Job = () => {
                       <Square15 topLeftText="Schedule">
                         {selectedRow.schedule}
                       </Square15>
-                      <Square15 topLeftText="Creation Time">
-                        {selectedRow.creation_time}
-                      </Square15>
-                      <Square4 topLeftText="Labels">
-                        {selectedRow.labels
-                          ? Object.entries(selectedRow.labels)
-                              .map(([key, value]) => `${key}: ${value}`)
-                              .join(", ")
+                      <Square4 topLeftText="Creation Time">
+                        {selectedRow.creation_time
+                          ? new Date(selectedRow.creation_time).toUTCString()
                           : "<none>"}
+                      </Square4>
+                      <Square4 topLeftText="Labels">
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
                       </Square4>
                     </>
                   )}
                 </div>
               </div>
             )}
-            <footer className="footer">
-              <div className="d-flex align-items-center"></div>
-            </footer>
           </div>
         </div>
       </div>

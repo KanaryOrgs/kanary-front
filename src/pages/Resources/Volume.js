@@ -24,22 +24,13 @@ export const Volume = () => {
   const [dataType, setDataType] = useState("PersistentVolume");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 필터 팝업 상태
   const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false); // 디테일 팝업 상태
-  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
-  const [checkboxes, setCheckboxes] = useState([
-    { id: 1, label: "nginx", isChecked: false },
-    { id: 2, label: "kube", isChecked: false },
-    { id: 3, label: "etcd", isChecked: false },
-    // Add more checkboxes as needed
-  ]);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const [data, setData] = useState([]);
-
   const {
     data: pvs,
     isLoading: loadingPvs,
     error: errorPvs,
-    refetch: refetchPvs,
   } = useQuery("pvs", () => fetchData("http://localhost:8080/v1/pvs"), {
     enabled: dataType === "PersistentVolume", // PersistentVolume일 때만 실행
   });
@@ -49,7 +40,6 @@ export const Volume = () => {
     data: pvcs,
     isLoading: loadingPvcs,
     error: errorPvcs,
-    refetch: refetchPvcs,
   } = useQuery("pvcs", () => fetchData("http://localhost:8080/v1/pvcs"), {
     enabled: dataType === "PersistentVolumeClaim", // PersistentVolume일 때만 실행
   });
@@ -59,7 +49,6 @@ export const Volume = () => {
     data: scs,
     isLoading: loadingScs,
     error: errorScs,
-    refetch: refetchScs,
   } = useQuery(
     "scs",
     () => fetchData("http://localhost:8080/v1/storageclasses"),
@@ -69,106 +58,87 @@ export const Volume = () => {
   );
   confirm(loadingScs, errorScs);
 
-  // PV
-  useEffect(() => {
-    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
-    if (dataType !== "PersistentVolume") return;
+  // 상태 업데이트: 로딩 중에도 이전 데이터를 유지
+  const openDetailPopup = async (row) => {
+    setIsDetailPopupOpen(true); // 팝업 열기
+    setLoadingDetail(true); // 로딩 시작
+    if (dataType == "PersistentVolume") {
+      try {
+        const detailUrl = `http://localhost:8080/v1/pvs/${row.name}`;
+        const detailData = await fetchData(detailUrl);
 
-    // 데이터가 없거나 로딩 중이면 실행하지 않음
-    if (!pvs || pvs.length === 0) {
-      refetchPvs(); // 데이터를 다시 가져오기 위해 refetch 호출
-      return;
+        // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+        setSelectedRow((prev) => ({
+          ...prev,
+          ...row,
+          ...detailData,
+        }));
+      } catch (error) {
+        console.error("Error fetching pod details:", error);
+      } finally {
+        setLoadingDetail(false); // 로딩 종료
+      }
     }
+    if (dataType == "PersistentVolumeClaim") {
+      try {
+        const detailUrl = `http://localhost:8080/v1/pvcs/${row.namespace}/${row.name}`;
+        const detailData = await fetchData(detailUrl);
 
-    const fetchPvMetrics = async () => {
-      // Fetch detailed metrics for each pod
-      const pvsMetricsPromises = pvs.map(async (pv) => {
-        const pvsMetricsUrl = `http://localhost:8080/v1/pvs/${pv.name}`;
-        const pvsMetrics = await fetchData(pvsMetricsUrl);
-        return {
-          ...pv,
-          creation_time: pvsMetrics.creation_time,
-          storage_class: pvsMetrics.storage_class,
-        };
-      });
-
-      // Wait for all metrics to be fetched
-      const updatedPvs = await Promise.all(pvsMetricsPromises);
-      setData(updatedPvs); // Store the updated pod details with metrics
-    };
-
-    fetchPvMetrics();
-  }, [dataType, pvs, refetchPvs]);
-
-  // PVC
-  useEffect(() => {
-    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
-    if (dataType !== "PersistentVolumeClaim") return;
-
-    // 데이터가 없거나 로딩 중이면 실행하지 않음
-    if (!pvcs || pvcs.length === 0) {
-      refetchPvcs(); // 데이터를 다시 가져오기 위해 refetch 호출
-      return;
+        // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+        setSelectedRow((prev) => ({
+          ...prev,
+          ...row,
+          ...detailData,
+        }));
+      } catch (error) {
+        console.error("Error fetching pod details:", error);
+      } finally {
+        setLoadingDetail(false); // 로딩 종료
+      }
     }
+    if (dataType == "StorageClass") {
+      try {
+        const detailUrl = `http://localhost:8080/v1/storageclasses/${row.name}`;
+        const detailData = await fetchData(detailUrl);
 
-    const fetchPvcMetrics = async () => {
-      // Fetch detailed metrics for each pod
-      const pvcsMetricsPromises = pvcs.map(async (pvc) => {
-        const pvcsMetricsUrl = `http://localhost:8080/v1/pvcs/${pvc.namespace}/${pvc.name}`;
-        const pvcsMetrics = await fetchData(pvcsMetricsUrl);
-        return {
-          ...pvc,
-          creation_time: pvcsMetrics.creation_time,
-          storage_request: pvcsMetrics.storage_request,
-        };
-      });
-
-      // Wait for all metrics to be fetched
-      const updatedPvcs = await Promise.all(pvcsMetricsPromises);
-      setData(updatedPvcs); // Store the updated pod details with metrics
-    };
-
-    fetchPvcMetrics();
-  }, [dataType, pvcs, refetchPvcs]);
-
-  // SC
-  useEffect(() => {
-    // 데이터 타입이 PersistentVolume이 아닌 경우 early return
-    if (dataType !== "StorageClass") return;
-
-    // 데이터가 없거나 로딩 중이면 실행하지 않음
-    if (!scs || scs.length === 0) {
-      refetchScs(); // 데이터를 다시 가져오기 위해 refetch 호출
-      return;
+        // 로딩 중에도 이전 데이터를 덮어씌우지 않음
+        setSelectedRow((prev) => ({
+          ...prev,
+          ...row,
+          ...detailData,
+        }));
+      } catch (error) {
+        console.error("Error fetching pod details:", error);
+      } finally {
+        setLoadingDetail(false); // 로딩 종료
+      }
     }
+  };
 
-    const fetchScMetrics = async () => {
-      // Fetch detailed metrics for each pod
-      const scsMetricsPromises = scs.map(async (sc) => {
-        const scsMetricsUrl = `http://localhost:8080/v1/storageclasses/${sc.name}`;
-        const scsMetrics = await fetchData(scsMetricsUrl);
-        return {
-          ...sc,
-          creation_time: scsMetrics.creation_time,
-          parameters: scsMetrics.parameters,
-        };
-      });
+  useEffect(() => {
+    // 초기 데이터 설정
+    if (dataType === "PersistentVolume" && pvs) {
+      setData(pvs);
+    } else if (dataType === "PersistentVolumeClaim" && pvcs) {
+      setData(pvcs);
+    } else if (dataType === "StorageClass" && scs) {
+      setData(scs);
+    }
+  }, [dataType, pvs, pvcs, scs]);
 
-      // Wait for all metrics to be fetched
-      const updatedScs = await Promise.all(scsMetricsPromises);
-      setData(updatedScs); // Store the updated pod details with metrics
-    };
-
-    fetchScMetrics();
-  }, [dataType, scs, refetchScs]);
-
-  // 데이터 타입 변경 핸들러
   const handleDataTypeChange = (type) => {
-    setDataType(type);
-    if (type === "PersistentVolume") setData(pvs);
-    if (type === "PersistentVolumeClaim") setData(pvcs);
-    if (type === "StorageClass") setData(scs);
+    setDataType(type); // 데이터 타입 변경
     setSearchTerm(""); // 검색어 초기화
+    setCurrentPage(1); // 페이지 초기화
+
+    // 데이터 동기화
+    if (type === "PersistentVolume" && pvs) {
+      setData(pvs);
+    } else if (type === "PersistentVolumeClaim" && pvcs) {
+      setData(pvcs);
+    } else if (type === "StorageClass" && scs) {
+      setData(scs);
+    }
   };
 
   if (
@@ -185,51 +155,8 @@ export const Volume = () => {
   )
     return <p>Error loading data.</p>;
 
-  const openPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-  };
-
-  const openDetailPopup = (row) => {
-    setSelectedRow(row);
-    setIsDetailPopupOpen(true);
-  };
-
   const closeDetailPopup = () => {
     setIsDetailPopupOpen(false);
-  };
-
-  const handleSelectAllChange = () => {
-    const newSelectAllChecked = !isSelectAllChecked;
-    setIsSelectAllChecked(newSelectAllChecked);
-    setCheckboxes(
-      checkboxes.map((checkbox) => ({
-        ...checkbox,
-        isChecked: newSelectAllChecked,
-      }))
-    );
-  };
-
-  const handleCheckboxChange = (id) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.id === id
-        ? { ...checkbox, isChecked: !checkbox.isChecked }
-        : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-
-    const allChecked = updatedCheckboxes.every(
-      (checkbox) => checkbox.isChecked
-    );
-    const noneChecked = updatedCheckboxes.every(
-      (checkbox) => !checkbox.isChecked
-    );
-    if (allChecked || noneChecked) {
-      setIsSelectAllChecked(allChecked);
-    }
   };
 
   const handleSearch = (searchTerm) => {
@@ -237,31 +164,11 @@ export const Volume = () => {
     setCurrentPage(1);
   };
 
-  const handleRemoveFilter = (label) => {
-    const updatedCheckboxes = checkboxes.map((checkbox) =>
-      checkbox.label === label ? { ...checkbox, isChecked: false } : checkbox
-    );
-    setCheckboxes(updatedCheckboxes);
-    setIsSelectAllChecked(false);
-  };
-
-  const getActiveFilters = () => {
-    return checkboxes
-      .filter((checkbox) => checkbox.isChecked)
-      .map((checkbox) => checkbox.label);
-  };
-
+  // 검색 필터링
   const filteredData = data
-    ? data.filter((item) => {
-        const matchesSearchTerm = item.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const activeFilters = getActiveFilters();
-        const matchesFilters =
-          activeFilters.length === 0 ||
-          activeFilters.every((filter) => item.name.includes(filter));
-        return matchesSearchTerm && matchesFilters;
-      })
+    ? data.filter((d) =>
+        d.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -281,7 +188,7 @@ export const Volume = () => {
         <Navbar />
         <div className="event-content">
           <div className="event-header">
-            <h2>Resources-Volume</h2>
+            <h2>Volume</h2>
             <p>Kubernetes Cluster Resources</p>
           </div>
         </div>
@@ -322,22 +229,6 @@ export const Volume = () => {
                   </button>
                 </div>
                 <div className="search-filter-wrapper">
-                  <div className="filter-container">
-                    {getActiveFilters().map(
-                      (
-                        filter // 필터 상자
-                      ) => (
-                        <div key={filter} className="filter-box">
-                          <span>{filter}</span>
-                          <FontAwesomeIcon
-                            icon={faTimes}
-                            className="close-icon"
-                            onClick={() => handleRemoveFilter(filter)}
-                          />
-                        </div>
-                      )
-                    )}
-                  </div>
                   <input // 검색창
                     type="text"
                     placeholder="Search"
@@ -345,13 +236,6 @@ export const Volume = () => {
                     onChange={(e) => handleSearch(e.target.value)}
                     className="search-input-resources"
                   />
-
-                  <button // 필터 버튼
-                    onClick={openPopup}
-                    className="button"
-                  >
-                    Filter
-                  </button>
                 </div>
                 <CDBTable responsive>
                   <CDBTableHeader>
@@ -488,54 +372,22 @@ export const Volume = () => {
                 </div>
               </div>
             </div>
-            {isPopupOpen && (
-              <div className="popup">
-                <h2>
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="close-button"
-                    onClick={closePopup}
-                  />{" "}
-                  Select Filters
-                </h2>
-                <div className="filter-popup">
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={isSelectAllChecked}
-                      onChange={handleSelectAllChange}
-                    />
-                    <label>Select All</label>
-                  </div>
-                  <div className="checkbox-container">
-                    {checkboxes.map((checkbox) => (
-                      <div key={checkbox.id}>
-                        <input
-                          type="checkbox"
-                          checked={checkbox.isChecked}
-                          onChange={() => handleCheckboxChange(checkbox.id)}
-                        />
-                        <label>{checkbox.label}</label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+
             {isDetailPopupOpen && (
-              <div className="popup">
+              <div className={`popup ${isDetailPopupOpen ? "open" : ""}`}>
                 <h2>
                   <FontAwesomeIcon
                     icon={faTimes}
                     className="close-button"
                     onClick={closeDetailPopup}
                   />
-                  {selectedRow.name}
+                  {selectedRow?.name || "Loading..."}
                 </h2>
-                <div className="popup-content">
+                <div
+                  className={`popup-content ${loadingDetail ? "loading" : ""}`}
+                >
                   {dataType === "PersistentVolume" && selectedRow && (
                     <>
-                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
                       <Square15 topLeftText="Capacity">
                         {selectedRow.capacity
                           ? selectedRow.capacity.storage
@@ -555,27 +407,35 @@ export const Volume = () => {
                       <Square15 topLeftText="Storage Class">
                         {selectedRow.storage_class}
                       </Square15>
-                      <Square15 topLeftText="Creation Time">
-                        {selectedRow.creation_time}
-                      </Square15>
+                      <Square4 topLeftText="Creation Time">
+                        <td>
+                          {selectedRow.creation_time
+                            ? new Date(selectedRow.creation_time).toUTCString()
+                            : ""}
+                        </td>
+                      </Square4>
                       <Square4 topLeftText="Labels">
-                        {selectedRow.labels
-                          ? Object.entries(selectedRow.labels)
-                              .map(([key, value]) => `${key}: ${value}`)
-                              .join(", ")
-                          : "<none>"}
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
                       </Square4>
                     </>
                   )}
 
                   {dataType === "PersistentVolumeClaim" && selectedRow && (
                     <>
-                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
                       <Square15 topLeftText="Namespace">
                         {selectedRow.namespace}
-                      </Square15>
-                      <Square15 topLeftText="Volume Name">
-                        {selectedRow.volume_name}
                       </Square15>
                       <Square15 topLeftText="Access Modes">
                         {selectedRow.access_modes
@@ -585,9 +445,6 @@ export const Volume = () => {
                       <Square15 topLeftText="Status">
                         {selectedRow.status}
                       </Square15>
-                      <Square15 topLeftText="Creation Time">
-                        {selectedRow.creation_time}
-                      </Square15>
                       <Square15 topLeftText="Storage Request">
                         {selectedRow.storage_request
                           ? Object.entries(selectedRow.storage_request)
@@ -595,19 +452,36 @@ export const Volume = () => {
                               .join(", ")
                           : "<none>"}
                       </Square15>
+                      <Square4 topLeftText="Creation Time">
+                        <td>
+                          {selectedRow.creation_time
+                            ? new Date(selectedRow.creation_time).toUTCString()
+                            : ""}
+                        </td>
+                      </Square4>
+                      <Square4 topLeftText="Volume Name">
+                        {selectedRow.volume_name}
+                      </Square4>
                       <Square4 topLeftText="Labels">
-                        {selectedRow.labels
-                          ? Object.entries(selectedRow.labels)
-                              .map(([key, value]) => `${key}: ${value}`)
-                              .join(", ")
-                          : "<none>"}
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
                       </Square4>
                     </>
                   )}
 
                   {dataType === "StorageClass" && selectedRow && (
                     <>
-                      <Square15 topLeftText="Name">{selectedRow.name}</Square15>
                       <Square15 topLeftText="Provisioner">
                         {selectedRow.provisioner}
                       </Square15>
@@ -617,22 +491,35 @@ export const Volume = () => {
                       <Square15 topLeftText="Allow Volume Expansion">
                         {selectedRow.allowVolumeExpansion ? "Yes" : "No"}
                       </Square15>
-                      <Square15 topLeftText="Creation Time">
-                        {selectedRow.creation_time}
-                      </Square15>
+                      <Square4 topLeftText="Creation Time">
+                        <td>
+                          {selectedRow.creation_time
+                            ? new Date(selectedRow.creation_time).toUTCString()
+                            : ""}
+                        </td>
+                      </Square4>
                       <Square4 topLeftText="Labels">
-                        {selectedRow.labels
-                          ? Object.entries(selectedRow.labels)
-                              .map(([key, value]) => `${key}: ${value}`)
-                              .join(", ")
-                          : "<none>"}
+                        {selectedRow.labels ? (
+                          <ul className="labels-list">
+                            {Object.entries(selectedRow.labels).map(
+                              ([key, value], index) => (
+                                <li key={index}>
+                                  <strong>{key}</strong>: {value || "<none>"}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          "N/A"
+                        )}
                       </Square4>
                       <Square4 topLeftText="Parameters">
-                        {selectedRow.parameters
+                        {selectedRow.parameters &&
+                        Object.keys(selectedRow.parameters).length > 0
                           ? Object.entries(selectedRow.parameters)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")
-                          : ""}
+                          : "<none>"}
                       </Square4>
                     </>
                   )}

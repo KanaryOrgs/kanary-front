@@ -105,6 +105,25 @@
   overflow-y: auto;
   max-height: "calc(100vh - 15%)";
 }
+.popup-content {
+  opacity: 3;
+  transition: opacity 1s ease-in-out;
+}
+
+.popup-content.loading {
+  opacity: 0; /* 로딩 중 희미하게 표시 */
+}
+.labels-list {
+  list-style-type: none; /* Remove bullets */
+  margin: 0;
+  padding: 0;
+}
+
+.labels-list li {
+  margin-bottom: 8px; /* Add spacing between lines */
+  line-height: 1.6; /* Improve readability with line height */
+  font-size: 17px; /* Adjust font size if needed */
+}
 
 .badge-stop {
   background-color: #ffc2c8;

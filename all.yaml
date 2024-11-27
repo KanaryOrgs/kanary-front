@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  namespace: nginx
+  labels:
+    app: example-nginx
+    pod-template-hash: "6fcb67d75b"
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.21
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+  volumes:
+    - name: kube-api-access
+      hostPath:
+        path: /var/run/secrets/kubernetes.io/serviceaccount
+  nodeName: minikube
+  restartPolicy: Always
+status:
+  phase: Running
+  podIP: 10.244.0.109
+  startTime: "2024-11-18T10:32:33Z"
+  containerStatuses:
+    - name: nginx
+      restartCount: 3
+---
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  namespace: default
+spec:
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: example-service
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-deployment
+  template:
+    metadata:
+      labels:
+        app: example-deployment
+    spec:
+      containers:
+        - name: example-container
+          image: nginx:1.21
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kanary-pv
+  labels:
+    environment: production
+    team: kanary
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: react-pv
+  labels:
+    environment: frontend
+    team: kanary
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pvc
+  namespace: default
+  labels:
+    app: example-app
+    environment: example
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pvc
+  namespace: default
+  labels:
+    app: example-app
+    environment: example
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  volumeName: pvc-f885d4be-ec80-4799-b14f-056caa71fbd6
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: example-storageclass
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+provisioner: k8s.io/minikube-hostpath
+reclaimPolicy: Delete
+allowVolumeExpansion: false
+parameters:
+  type: default
+---
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: example-statefulset
+  namespace: default
+spec:
+  serviceName: "example-service"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-statefulset
+  template:
+    metadata:
+      labels:
+        app: example-statefulset
+    spec:
+      containers:
+        - name: example-container
+          image: nginx:1.21
+          ports:
+            - containerPort: 80
+
+---
+
